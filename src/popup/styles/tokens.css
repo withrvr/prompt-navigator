@@ -1,0 +1,31 @@
+/* Design tokens. Twitch/Zepto-inspired purple accent on soft, eye-friendly
+   surfaces — never pure black/white. Override per-theme in theme.css. */
+
+:root {
+  /* Sizing */
+  --pn-popup-width: 360px;
+  --pn-popup-min-height: 240px;
+  --pn-popup-max-height: 600px;
+
+  --pn-radius-sm: 6px;
+  --pn-radius-md: 10px;
+  --pn-radius-lg: 14px;
+
+  --pn-space-1: 4px;
+  --pn-space-2: 8px;
+  --pn-space-3: 12px;
+  --pn-space-4: 16px;
+  --pn-space-5: 20px;
+  --pn-space-6: 24px;
+
+  --pn-font-xs: 11px;
+  --pn-font-sm: 12px;
+  --pn-font-md: 14px;
+  --pn-font-lg: 16px;
+  --pn-font-xl: 18px;
+
+  --pn-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.18);
+  --pn-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.18);
+
+  --pn-transition: 120ms ease;
+}

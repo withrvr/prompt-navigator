@@ -1,0 +1,13 @@
+node_modules/
+dist/
+dist-firefox/
+*.zip
+.vite/
+.DS_Store
+*.log
+.env
+.env.local
+coverage/
+.idea/
+.vscode/*
+!.vscode/extensions.json

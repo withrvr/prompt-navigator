@@ -1,0 +1,59 @@
+/* Theme palettes. Soft dark + soft light, both with a Twitch-ish purple
+   accent. Switched via [data-theme] on <html>; "auto" resolves to dark or
+   light from prefers-color-scheme. */
+
+:root[data-theme='dark'] {
+  --pn-bg: #0e0e10;
+  --pn-surface: #1f1f23;
+  --pn-surface-2: #26262c;
+  --pn-border: #2f2f37;
+  --pn-text: #efeff1;
+  --pn-text-muted: #adadb8;
+  --pn-accent: #9146ff;
+  --pn-accent-soft: #bf94ff;
+  --pn-accent-contrast: #ffffff;
+  --pn-danger: #f87171;
+}
+
+:root[data-theme='light'] {
+  --pn-bg: #fafafa;
+  --pn-surface: #ffffff;
+  --pn-surface-2: #f3f3f7;
+  --pn-border: #e5e5ec;
+  --pn-text: #0e0e10;
+  --pn-text-muted: #53535f;
+  --pn-accent: #7d2bdb;
+  --pn-accent-soft: #a970ff;
+  --pn-accent-contrast: #ffffff;
+  --pn-danger: #dc2626;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme='auto'] {
+    --pn-bg: #0e0e10;
+    --pn-surface: #1f1f23;
+    --pn-surface-2: #26262c;
+    --pn-border: #2f2f37;
+    --pn-text: #efeff1;
+    --pn-text-muted: #adadb8;
+    --pn-accent: #9146ff;
+    --pn-accent-soft: #bf94ff;
+    --pn-accent-contrast: #ffffff;
+    --pn-danger: #f87171;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  :root[data-theme='auto'] {
+    --pn-bg: #fafafa;
+    --pn-surface: #ffffff;
+    --pn-surface-2: #f3f3f7;
+    --pn-border: #e5e5ec;
+    --pn-text: #0e0e10;
+    --pn-text-muted: #53535f;
+    --pn-accent: #7d2bdb;
+    --pn-accent-soft: #a970ff;
+    --pn-accent-contrast: #ffffff;
+    --pn-danger: #dc2626;
+  }
+}
