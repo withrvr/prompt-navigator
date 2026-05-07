@@ -1,5 +1,8 @@
 // Empty-state component. Renders when the popup has nothing useful to list.
 // Covers every non-happy path so the user always has an explanation + next step.
+// All strings run through t() so locale overrides work automatically.
+
+import { t } from '@/shared/i18n';
 
 export type EmptyReason =
   | 'unsupported'
@@ -15,33 +18,22 @@ interface EmptyStateOptions {
   reportUrl?: string;
 }
 
-const COPY: Record<EmptyReason, { icon: string; heading: string; body: string }> = {
-  loading: {
-    icon: '⏳',
-    heading: 'Loading…',
-    body: 'Scanning the conversation.',
-  },
-  'no-prompts': {
-    icon: '💬',
-    heading: 'No messages yet',
-    body: 'Start chatting and your prompts will appear here.',
-  },
-  'no-match': {
-    icon: '🔍',
-    heading: 'No matches',
-    body: 'Try a different search term.',
-  },
-  unsupported: {
-    icon: '🌐',
-    heading: 'Site not supported',
-    body: 'Prompt Navigator works on ChatGPT, Claude, Gemini, and more. Open a conversation there first.',
-  },
-  error: {
-    icon: '⚠️',
-    heading: 'Something went wrong',
-    body: 'Could not read the page. Try refreshing the AI tab, then click the icon again.',
-  },
-};
+type CopyCfg = { icon: string; heading: string; body: string };
+
+function getCopy(reason: EmptyReason): CopyCfg {
+  switch (reason) {
+    case 'loading':
+      return { icon: '⏳', heading: t('empty.loading.heading'), body: t('empty.loading.body') };
+    case 'no-prompts':
+      return { icon: '💬', heading: t('empty.noPrompts.heading'), body: t('empty.noPrompts.body') };
+    case 'no-match':
+      return { icon: '🔍', heading: t('empty.noMatch.heading'), body: t('empty.noMatch.body') };
+    case 'unsupported':
+      return { icon: '🌐', heading: t('empty.unsupported.heading'), body: t('empty.unsupported.body') };
+    case 'error':
+      return { icon: '⚠️', heading: t('empty.error.heading'), body: t('empty.error.body') };
+  }
+}
 
 /** Builds a pre-filled GitHub issue URL for a broken-selector report. */
 export function buildReportUrl(platform: string, pageUrl: string): string {
@@ -66,7 +58,7 @@ export function buildReportUrl(platform: string, pageUrl: string): string {
 
 /** Renders an informative empty state into `container`, replacing its content. */
 export function renderEmptyState(container: HTMLElement, opts: EmptyStateOptions): void {
-  const { icon, heading, body } = COPY[opts.reason];
+  const { icon, heading, body } = getCopy(opts.reason);
 
   const el = document.createElement('div');
   el.className = 'empty-state';
@@ -82,7 +74,7 @@ export function renderEmptyState(container: HTMLElement, opts: EmptyStateOptions
     link.href = opts.reportUrl;
     link.target = '_blank';
     link.rel = 'noopener noreferrer';
-    link.textContent = '🐛 Report broken selectors';
+    link.textContent = t('empty.report');
     el.appendChild(link);
   }
 
