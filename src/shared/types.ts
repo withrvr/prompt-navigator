@@ -24,6 +24,12 @@ export type PlatformId =
   | 'chatgpt'
   | 'claude'
   | 'gemini'
+  | 'perplexity'
+  | 'grok'
+  | 'deepseek'
+  | 'mistral'
+  | 'kimi'
+  | 'meta'
   | 'unknown';
 
 /**
