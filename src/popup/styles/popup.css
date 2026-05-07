@@ -1,5 +1,4 @@
-/* Popup layout + components. Kept compact (360px wide) and dense, but with
-   tap targets large enough for trackpads. */
+/* Popup layout + components. 360px wide, dense but tap-friendly. */
 
 html,
 body {
@@ -14,6 +13,8 @@ body {
   overflow: hidden;
 }
 
+/* ── Root layout ─────────────────────────────────────────────────────────── */
+
 .app {
   display: flex;
   flex-direction: column;
@@ -22,6 +23,8 @@ body {
   max-height: var(--pn-popup-max-height);
 }
 
+/* ── Header ──────────────────────────────────────────────────────────────── */
+
 .app__header {
   display: flex;
   align-items: center;
@@ -29,6 +32,7 @@ body {
   padding: var(--pn-space-3) var(--pn-space-4);
   border-bottom: 1px solid var(--pn-border);
   background: var(--pn-surface);
+  flex-shrink: 0;
 }
 
 .app__brand {
@@ -48,21 +52,95 @@ body {
   letter-spacing: 0.01em;
 }
 
-.app__body {
-  flex: 1 1 auto;
-  overflow: auto;
-  padding: var(--pn-space-4);
-  display: flex;
-  flex-direction: column;
-  gap: var(--pn-space-3);
+.app__count {
+  font-size: var(--pn-font-xs);
+  color: var(--pn-text-muted);
 }
 
-.app__tagline {
+/* ── Body ────────────────────────────────────────────────────────────────── */
+
+.app__body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+/* ── Prompt list ─────────────────────────────────────────────────────────── */
+
+.prompt-list {
+  padding: var(--pn-space-2) 0;
+}
+
+.prompt-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--pn-space-2);
+  padding: var(--pn-space-2) var(--pn-space-4);
+  cursor: pointer;
+  border-radius: 0;
+  transition: background var(--pn-transition);
+  outline: none;
+}
+
+.prompt-item:hover,
+.prompt-item:focus-visible {
+  background: var(--pn-surface-2);
+}
+
+.prompt-item:active {
+  background: var(--pn-surface-2);
+  opacity: 0.8;
+}
+
+.prompt-item__index {
+  flex-shrink: 0;
+  min-width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--pn-accent);
+  color: var(--pn-accent-contrast);
+  font-size: var(--pn-font-xs);
+  font-weight: 700;
+  border-radius: var(--pn-radius-sm);
+  margin-top: 1px;
+}
+
+.prompt-item__text {
+  font-size: var(--pn-font-sm);
+  color: var(--pn-text);
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+/* ── Empty state ─────────────────────────────────────────────────────────── */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--pn-space-6) var(--pn-space-4);
+  gap: var(--pn-space-2);
+  min-height: 160px;
+}
+
+.empty-state__icon {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.empty-state__heading {
   font-size: var(--pn-font-md);
+  font-weight: 600;
   color: var(--pn-text);
 }
 
-.app__hint {
+.empty-state__body {
   font-size: var(--pn-font-sm);
   color: var(--pn-text-muted);
+  max-width: 260px;
+  line-height: 1.55;
 }

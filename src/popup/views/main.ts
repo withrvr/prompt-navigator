@@ -1,30 +1,76 @@
-// Main view of the popup. Phase 1 renders a header + a "ready" placeholder
-// so we can verify the build pipeline end-to-end. Phase 2 replaces the body
-// with the live prompt list driven by messages from the content script.
+// Main popup view. Queries the active tab's content script for user prompts
+// and renders them as a clickable list. Clicking a prompt sends a SCROLL_TO
+// message back so the page scrolls to that turn.
 
-const TITLE = 'Prompt Navigator';
-const TAGLINE = 'Jump to any prompt in your AI chat.';
+import browser from '@/shared/browser';
+import { logger } from '@/shared/logger';
+import type { Message } from '@/shared/messages';
+import type { PromptsResponse } from '@/shared/types';
+import { renderHeader, updateHeaderCount } from '../components/Header';
+import { renderPromptList } from '../components/PromptList';
+import { renderEmptyState } from '../components/EmptyState';
 
-export function renderMainView(root: HTMLElement): void {
+// ── Helpers ────────────────────────────────────────────────────────────────
+
+async function getActiveTabId(): Promise<number | null> {
+  const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
+  return tab?.id ?? null;
+}
+
+async function sendToContent<T>(tabId: number, msg: Message): Promise<T | null> {
+  try {
+    return (await browser.tabs.sendMessage(tabId, msg)) as T;
+  } catch (err) {
+    logger.warn('popup: sendMessage failed', err);
+    return null;
+  }
+}
+
+// ── Main render ─────────────────────────────────────────────────────────────
+
+export async function renderMainView(root: HTMLElement): Promise<void> {
   root.innerHTML = '';
 
-  const header = document.createElement('header');
-  header.className = 'app__header';
-  header.innerHTML = `
-    <div class="app__brand">
-      <span class="app__logo" aria-hidden="true">🧭</span>
-      <h1 class="app__title">${TITLE}</h1>
-    </div>
-  `;
-
+  // Skeleton: header + body
+  const headerContainer = document.createElement('div');
   const body = document.createElement('section');
   body.className = 'app__body';
-  body.innerHTML = `
-    <p class="app__tagline">${TAGLINE}</p>
-    <p class="app__hint">
-      Open ChatGPT, Claude, or Gemini and click the icon again to see your prompts.
-    </p>
-  `;
 
-  root.append(header, body);
+  root.appendChild(headerContainer);
+  root.appendChild(body);
+
+  renderHeader(headerContainer, {});
+  renderEmptyState(body, { reason: 'loading' });
+
+  // ── Fetch prompts from content script ──────────────────────────────────
+  const tabId = await getActiveTabId();
+  if (tabId === null) {
+    renderEmptyState(body, { reason: 'error', detail: 'No active tab found.' });
+    return;
+  }
+
+  const response = await sendToContent<PromptsResponse>(tabId, { type: 'GET_PROMPTS' });
+
+  if (!response) {
+    // Content script isn't running — likely an unsupported page or the
+    // script hasn't loaded yet.
+    renderHeader(headerContainer, {});
+    renderEmptyState(body, { reason: 'unsupported' });
+    return;
+  }
+
+  const { prompts, platform } = response;
+  logger.debug('popup: got', prompts.length, 'prompts from', platform);
+
+  const header = renderHeader(headerContainer, { count: prompts.length });
+
+  // ── Navigate handler ───────────────────────────────────────────────────
+  async function onNavigate(promptId: string): Promise<void> {
+    await sendToContent(tabId!, { type: 'SCROLL_TO', promptId });
+    // Close the popup so the user can see the page scroll to the prompt.
+    window.close();
+  }
+
+  renderPromptList(body, { prompts, onNavigate });
+  updateHeaderCount(header, prompts.length);
 }
