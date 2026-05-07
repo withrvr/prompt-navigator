@@ -6,8 +6,13 @@
 import type { PromptAdapter } from './base';
 import { ChatGptAdapter } from './chatgpt';
 import { ClaudeAdapter } from './claude';
+import { GeminiAdapter } from './gemini';
 
-const ADAPTERS: PromptAdapter[] = [new ChatGptAdapter(), new ClaudeAdapter()];
+const ADAPTERS: PromptAdapter[] = [
+  new ChatGptAdapter(),
+  new ClaudeAdapter(),
+  new GeminiAdapter(),
+];
 
 /**
  * Return the adapter for the given URL, or `null` if no adapter recognizes
