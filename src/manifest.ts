@@ -15,6 +15,18 @@ const SUPPORTED_HOSTS = [
   'https://chat.openai.com/*',
   'https://claude.ai/*',
   'https://gemini.google.com/*',
+  'https://www.perplexity.ai/*',
+  'https://perplexity.ai/*',
+  'https://grok.com/*',
+  'https://www.grok.com/*',
+  'https://x.com/i/grok*',
+  'https://chat.deepseek.com/*',
+  'https://chat.mistral.ai/*',
+  'https://kimi.com/*',
+  'https://www.kimi.com/*',
+  'https://kimi.moonshot.cn/*',
+  'https://meta.ai/*',
+  'https://www.meta.ai/*',
 ];
 
 export default defineManifest({
@@ -22,7 +34,7 @@ export default defineManifest({
   name: 'Prompt Navigator',
   version: pkg.version,
   description:
-    'Jump to any prompt in your AI chat. Lists, searches, favorites, and exports your messages on ChatGPT, Claude, and Gemini.',
+    'Jump to any prompt in your AI chat. Lists, searches, favorites, and exports your messages across ChatGPT, Claude, Gemini, Perplexity, Grok, DeepSeek, Mistral, Kimi, and Meta AI.',
   icons: {
     16: 'public/icons/icon-16.png',
     32: 'public/icons/icon-32.png',
@@ -51,4 +63,13 @@ export default defineManifest({
   ],
   permissions: ['activeTab', 'storage', 'scripting'],
   host_permissions: SUPPORTED_HOSTS,
+  commands: {
+    _execute_action: {
+      suggested_key: {
+        default: 'Alt+P',
+        mac: 'Alt+P',
+      },
+      description: 'Open Prompt Navigator',
+    },
+  },
 });

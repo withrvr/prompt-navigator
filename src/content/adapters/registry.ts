@@ -7,11 +7,23 @@ import type { PromptAdapter } from './base';
 import { ChatGptAdapter } from './chatgpt';
 import { ClaudeAdapter } from './claude';
 import { GeminiAdapter } from './gemini';
+import { PerplexityAdapter } from './perplexity';
+import { GrokAdapter } from './grok';
+import { DeepSeekAdapter } from './deepseek';
+import { MistralAdapter } from './mistral';
+import { KimiAdapter } from './kimi';
+import { MetaAdapter } from './meta';
 
 const ADAPTERS: PromptAdapter[] = [
   new ChatGptAdapter(),
   new ClaudeAdapter(),
   new GeminiAdapter(),
+  PerplexityAdapter,
+  new GrokAdapter(),
+  DeepSeekAdapter,
+  MistralAdapter,
+  KimiAdapter,
+  MetaAdapter,
 ];
 
 /**

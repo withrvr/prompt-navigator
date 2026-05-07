@@ -6,6 +6,12 @@ const SUPPORTED = [
   { icon: '🤖', name: 'ChatGPT', url: 'chatgpt.com' },
   { icon: '🧠', name: 'Claude', url: 'claude.ai' },
   { icon: '💎', name: 'Gemini', url: 'gemini.google.com' },
+  { icon: '🔍', name: 'Perplexity', url: 'perplexity.ai' },
+  { icon: '🦾', name: 'Grok', url: 'grok.com' },
+  { icon: '🐳', name: 'DeepSeek', url: 'chat.deepseek.com' },
+  { icon: '🌬️', name: 'Mistral', url: 'chat.mistral.ai' },
+  { icon: '🌙', name: 'Kimi', url: 'kimi.com' },
+  { icon: '🪶', name: 'Meta AI', url: 'meta.ai' },
 ];
 
 export function renderInfoView(root: HTMLElement, onBack: () => void): void {
@@ -50,6 +56,17 @@ export function renderInfoView(root: HTMLElement, onBack: () => void): void {
   }
   platformSection.appendChild(platformList);
 
+  // Keyboard
+  const keyboardSection = document.createElement('div');
+  keyboardSection.className = 'settings-section';
+  keyboardSection.innerHTML = `
+    <h2 class="settings-section__title">Keyboard</h2>
+    <p class="settings-section__body">
+      Press <kbd>Alt</kbd>+<kbd>P</kbd> to open Prompt Navigator from anywhere.
+      Customize at <code>chrome://extensions/shortcuts</code>.
+    </p>
+  `;
+
   // Links
   const linksSection = document.createElement('div');
   linksSection.className = 'settings-section';
@@ -63,6 +80,7 @@ export function renderInfoView(root: HTMLElement, onBack: () => void): void {
 
   body.appendChild(vSection);
   body.appendChild(platformSection);
+  body.appendChild(keyboardSection);
   body.appendChild(linksSection);
   root.appendChild(header);
   root.appendChild(body);
