@@ -1,48 +1,50 @@
 # State
 
-> Lightweight log of what's done and what's next. Updated at the end of every phase.
+> Lightweight log of what's done and what's next.
 
-## Now
+## Current branch
 
-**v1 complete.** All 16 phases shipped.
+`claude/v1.1-features` — v1.1 work in progress (not yet merged to v1).
 
-## What's done
+## v1.1 progress
 
-| Phase | Deliverable |
-|---|---|
-| 1 | Scaffold: Vite + TS + @crxjs, manifest, popup skeleton, theme tokens, docs, CI |
-| 2 | ChatGPT adapter + content script messaging + popup list |
-| 3 | Click-to-navigate + purple flash highlight (safe scroll, no scrollIntoView) |
-| 4 | Claude adapter (`[data-testid="user-message"]`, avoids scrollIntoView) |
-| 5 | Gemini adapter (`<user-query>` custom element, child selector fallback) |
-| 6 | Search / filter (live, case-insensitive, match highlight), count, refresh 🔄 |
-| 7 | Theme system: auto/dark/light, purple accent (#9146FF), persisted |
-| 8 | Favorites ⭐ (browser.storage.local) + copy 📋 (clipboard API) |
-| 9 | Export: JSON · CSV · PDF (iframe print dialog) |
-| 10 | Settings view + Info view + in-process view router |
-| 11 | Non-happy path states: loading, no-prompts, no-match, unsupported, error |
-| 12 | Dev/prod logger (silent in production builds) — shipped with phase 1 |
-| 13 | Firefox build target (`scripts/build-firefox.ts` → `dist-firefox/`) |
-| 14 | 25 Vitest unit tests (adapters + exporters, jsdom env, path aliases) |
-| 15 | README: install steps, usage guide, feature table, store badge placeholders |
-| 16 | `scripts/package-zip.ts` → `dist/chrome.zip` + `dist-firefox/firefox.zip` |
+| # | Feature | Status |
+|---|---|---|
+| 1 | PlatformId expansion + makeAdapter helper | ✅ committed |
+| 2 | Perplexity adapter | ✅ committed |
+| 3 | Grok adapter | ✅ committed |
+| 4 | DeepSeek adapter | ✅ committed |
+| 5 | Mistral / Le Chat adapter | ✅ committed |
+| 6 | Kimi adapter | ✅ committed |
+| 7 | Meta AI adapter | ✅ committed |
+| 8 | Favorites-only filter toggle | ✅ committed |
+| 9 | Alt+P keyboard shortcut | ✅ committed |
 
-## Next (v1.1)
+**57 tests passing** (was 25 in v1).
 
-Add secondary adapters — one commit each:
+## Known caveats for v1.1 adapters
 
-- Perplexity (`perplexity.ai`)
-- Grok (`grok.com`, `x.com/i/grok`)
-- DeepSeek (`chat.deepseek.com`)
-- Mistral / Le Chat (`chat.mistral.ai`)
-- Kimi (`kimi.com`)
-- Meta AI (`meta.ai`)
+The 6 secondary platforms shipped with selector chains based on:
+- Confirmed selectors: Grok (`div.message-bubble`)
+- Educated guesses based on common React/Tailwind patterns: Perplexity, DeepSeek, Mistral, Kimi, Meta AI
 
-Then: submit to Chrome Web Store + Mozilla AMO.
+Each adapter has 4–5 fallback selectors so it's resilient to single-marker changes. Real-world testing on each live site is the next QA step. If a selector misses, the popup shows the friendly "no prompts yet" empty state — never crashes.
 
-## How to run locally
+## v1 summary (already merged-able)
+
+All 16 phases shipped on `claude/plan-dev-workflow-a65rM`:
+1–16: scaffold → adapters → click-navigate → search/refresh → theme → favorites/copy → export → settings/info → empty states → Firefox build → tests → docs → packaging.
+
+## Run locally
 
 ```bash
 npm install && npm run build
-# Load dist/ as unpacked extension in Chrome dev mode
+# Load dist/ as unpacked extension in Chrome
+# Press Alt+P to open the popup quickly
 ```
+
+## Next
+
+- User-side testing of v1.1 adapters on live sites
+- Refine selectors if any platform misses
+- Merge v1.1 → v1 → submit to Chrome Web Store + Mozilla AMO

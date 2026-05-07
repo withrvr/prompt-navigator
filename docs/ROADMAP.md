@@ -2,43 +2,42 @@
 
 > Living document. Move items as they ship.
 
-## ✅ Done (v1)
+## ✅ Done — v1 (`claude/plan-dev-workflow-a65rM`)
 
 - Scaffold: Vite + TS + @crxjs, MV3 manifest, popup, icons, CI
-- ChatGPT adapter (`[data-message-author-role="user"]`)
-- Click-to-navigate + purple flash highlight
-- Claude adapter (`[data-testid="user-message"]`)
-- Gemini adapter (`<user-query>` custom element)
+- ChatGPT, Claude, Gemini adapters
+- Click-to-navigate + purple flash highlight (no scrollIntoView)
 - Live search + match highlight + count + refresh
 - Auto/Dark/Light theme (purple accent, eye-friendly)
-- Favorites ⭐ (persisted) + copy 📋
+- Favorites ⭐ + copy 📋
 - Export: JSON · CSV · PDF
 - Settings view + Info view + view router
 - Non-happy path states (loading / no-prompts / no-match / unsupported / error)
 - Firefox build target
-- 25 unit tests (Vitest + jsdom)
+- 25 unit tests
 - Packaging scripts (`chrome.zip`, `firefox.zip`)
 
-## 🔜 v1.1 — Secondary adapters
+## ✅ Done — v1.1 (`claude/v1.1-features`)
 
-Each is one commit: copy `chatgpt.ts` template, fill selectors, add fixture + test, register.
-
-| Platform | Host | Status |
-|---|---|---|
-| Perplexity | `perplexity.ai` | pending |
-| Grok | `grok.com`, `x.com` | pending |
-| DeepSeek | `chat.deepseek.com` | pending |
-| Mistral | `chat.mistral.ai` | pending |
-| Kimi | `kimi.com` | pending |
-| Meta AI | `meta.ai` | pending |
+- `PlatformId` expansion + `makeAdapter()` helper
+- Perplexity adapter (`perplexity.ai`)
+- Grok adapter (`grok.com`, `x.com/i/grok`)
+- DeepSeek adapter (`chat.deepseek.com`)
+- Mistral / Le Chat adapter (`chat.mistral.ai`)
+- Kimi adapter (`kimi.com`, `kimi.moonshot.cn`)
+- Meta AI adapter (`meta.ai`)
+- Favorites-only filter toggle (⭐ in search bar)
+- `Alt+P` keyboard shortcut to open popup
+- 57 unit tests total (32 new tests in v1.1)
 
 ## 🌌 Backlog
 
 - Optional in-page floating navigator button (off by default)
-- Keyboard shortcut (e.g. `Alt+P`) to open popup
 - AI-generated summary/title per prompt cluster
 - Conversation switcher across recent chats
 - Internationalization (i18n)
 - Safari packaging via Xcode wrapper
 - Per-platform "report broken selector" quick-link
-- Favorites filter toggle (show only starred)
+- Custom keyboard shortcuts per action (copy, favorite, jump-to-N)
+- Bulk export (selected prompts only)
+- Drag-to-reorder favorites list
