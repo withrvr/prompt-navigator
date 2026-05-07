@@ -227,6 +227,118 @@ body {
   -webkit-appearance: none;
 }
 
+/* ── Settings / Info views ───────────────────────────────────────────────── */
+
+.settings-body {
+  padding: var(--pn-space-3) var(--pn-space-4);
+  gap: var(--pn-space-5);
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pn-space-2);
+}
+
+.settings-section__title {
+  font-size: var(--pn-font-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--pn-text-muted);
+}
+
+.settings-section__body {
+  font-size: var(--pn-font-sm);
+  color: var(--pn-text-muted);
+  line-height: 1.55;
+}
+
+.settings-link {
+  color: var(--pn-accent-soft);
+  text-decoration: none;
+}
+
+.settings-link:hover {
+  text-decoration: underline;
+}
+
+.settings-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pn-space-1);
+}
+
+.settings-radio {
+  display: flex;
+  align-items: center;
+  gap: var(--pn-space-2);
+  cursor: pointer;
+  padding: var(--pn-space-1) var(--pn-space-2);
+  border-radius: var(--pn-radius-sm);
+  transition: background var(--pn-transition);
+}
+
+.settings-radio:hover {
+  background: var(--pn-surface-2);
+}
+
+.settings-radio__label {
+  font-size: var(--pn-font-sm);
+}
+
+/* Info view */
+.info-brand {
+  flex-direction: row !important;
+  align-items: center;
+  gap: var(--pn-space-3) !important;
+}
+
+.info-brand__logo {
+  font-size: 36px;
+  line-height: 1;
+}
+
+.info-brand__name {
+  font-size: var(--pn-font-lg);
+  font-weight: 700;
+}
+
+.info-brand__version {
+  font-size: var(--pn-font-xs);
+  color: var(--pn-text-muted);
+}
+
+.info-platforms {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pn-space-1);
+}
+
+.info-platform {
+  font-size: var(--pn-font-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--pn-space-2);
+}
+
+.info-platform__url {
+  color: var(--pn-text-muted);
+  font-size: var(--pn-font-xs);
+}
+
+.info-links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pn-space-1);
+}
+
+.info-links li {
+  font-size: var(--pn-font-sm);
+}
+
 /* Search highlight mark */
 .prompt-item__match {
   background: var(--pn-accent-soft);

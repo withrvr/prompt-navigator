@@ -1,13 +1,38 @@
-// Popup entry point. Bootstraps the main view inside `#app`.
+// Popup entry point. Bootstraps the view router inside `#app`.
+//
+// Views: main (default) ↔ settings ↔ info.
+// Navigation is in-process (no URL changes); each view replaces #app content.
 
 import { applyStoredTheme } from './theme';
 import { renderMainView } from './views/main';
+import { renderSettingsView } from './views/settings';
+import { renderInfoView } from './views/info';
+
+export type ViewName = 'main' | 'settings' | 'info';
+
+let root: HTMLElement;
+
+export function navigate(view: ViewName): void {
+  root.innerHTML = '';
+  switch (view) {
+    case 'main':
+      void renderMainView(root, navigate);
+      break;
+    case 'settings':
+      renderSettingsView(root, () => navigate('main'));
+      break;
+    case 'info':
+      renderInfoView(root, () => navigate('main'));
+      break;
+  }
+}
 
 function mount(): void {
-  const root = document.getElementById('app');
-  if (!root) throw new Error('Popup root #app not found');
+  const el = document.getElementById('app');
+  if (!el) throw new Error('Popup root #app not found');
+  root = el;
   applyStoredTheme();
-  void renderMainView(root);
+  navigate('main');
 }
 
 if (document.readyState === 'loading') {

@@ -1,6 +1,5 @@
 // Main popup view. Fetches user prompts from the active tab, then provides
-// live search, a prompt count, and a refresh button. Clicking any prompt
-// sends SCROLL_TO to the content script and closes the popup.
+// live search, a prompt count, refresh, and access to settings/info views.
 
 import browser from '@/shared/browser';
 import { logger } from '@/shared/logger';
@@ -11,6 +10,7 @@ import { renderPromptList } from '../components/PromptList';
 import { renderEmptyState } from '../components/EmptyState';
 import { createSearchBar, filterPrompts } from '../components/SearchBar';
 import { renderFooter } from '../components/Footer';
+import type { ViewName } from '../popup';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -30,10 +30,12 @@ async function sendToContent<T>(tabId: number, msg: Message): Promise<T | null> 
 
 // ── Main render ─────────────────────────────────────────────────────────────
 
-export async function renderMainView(root: HTMLElement): Promise<void> {
+export async function renderMainView(
+  root: HTMLElement,
+  navigate: (view: ViewName) => void,
+): Promise<void> {
   root.innerHTML = '';
 
-  // Skeleton: header container + search + body + footer
   const headerContainer = document.createElement('div');
   const searchContainer = document.createElement('div');
   searchContainer.className = 'app__search';
@@ -46,10 +48,9 @@ export async function renderMainView(root: HTMLElement): Promise<void> {
   root.appendChild(body);
   root.appendChild(footerContainer);
 
-  renderHeader(headerContainer, {});
+  renderHeader(headerContainer, { onSettings: () => navigate('settings') });
   renderEmptyState(body, { reason: 'loading' });
 
-  // ── Fetch prompts ──────────────────────────────────────────────────────
   const tabId = await getActiveTabId();
   if (tabId === null) {
     renderEmptyState(body, { reason: 'error', detail: 'No active tab found.' });
@@ -61,7 +62,7 @@ export async function renderMainView(root: HTMLElement): Promise<void> {
     const response = await sendToContent<PromptsResponse>(tabId, { type: 'GET_PROMPTS' });
 
     if (!response) {
-      renderHeader(headerContainer, {});
+      renderHeader(headerContainer, { onSettings: () => navigate('settings') });
       searchContainer.innerHTML = '';
       renderEmptyState(body, { reason: 'unsupported' });
       return;
@@ -75,24 +76,24 @@ export async function renderMainView(root: HTMLElement): Promise<void> {
     const header = renderHeader(headerContainer, {
       count: prompts.length,
       onRefresh: () => void fetchAndRender(),
+      onSettings: () => navigate('settings'),
     });
 
-    // Search bar
     searchContainer.innerHTML = '';
     if (prompts.length > 0) {
       const bar = createSearchBar({
         onSearch: (q) => {
           currentQuery = q;
           const filtered = filterPrompts(prompts, q);
-          renderList(filtered, q);
+          void renderList(filtered, q);
           updateHeaderCount(header, filtered.length, prompts.length);
         },
       });
       searchContainer.appendChild(bar);
     }
 
-    const renderList = (list: Prompt[], query: string): void => {
-      void renderPromptList(body, {
+    const renderList = async (list: Prompt[], query: string): Promise<void> => {
+      await renderPromptList(body, {
         prompts: list,
         onNavigate: async (promptId) => {
           await sendToContent(tabId, { type: 'SCROLL_TO', promptId });
@@ -102,10 +103,9 @@ export async function renderMainView(root: HTMLElement): Promise<void> {
       });
     };
 
-    renderList(prompts, currentQuery);
+    await renderList(prompts, currentQuery);
     updateHeaderCount(header, prompts.length, prompts.length);
 
-    // Footer: export menu (only when we have prompts)
     if (prompts.length > 0) {
       renderFooter(footerContainer, { prompts, platform });
     }
