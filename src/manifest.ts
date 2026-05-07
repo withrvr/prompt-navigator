@@ -22,6 +22,9 @@ const SUPPORTED_HOSTS = [
   'https://x.com/i/grok*',
   'https://chat.deepseek.com/*',
   'https://chat.mistral.ai/*',
+  'https://kimi.com/*',
+  'https://www.kimi.com/*',
+  'https://kimi.moonshot.cn/*',
 ];
 
 export default defineManifest({

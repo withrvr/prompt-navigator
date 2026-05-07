@@ -11,6 +11,7 @@ import { PerplexityAdapter } from './perplexity';
 import { GrokAdapter } from './grok';
 import { DeepSeekAdapter } from './deepseek';
 import { MistralAdapter } from './mistral';
+import { KimiAdapter } from './kimi';
 
 const ADAPTERS: PromptAdapter[] = [
   new ChatGptAdapter(),
@@ -20,6 +21,7 @@ const ADAPTERS: PromptAdapter[] = [
   new GrokAdapter(),
   DeepSeekAdapter,
   MistralAdapter,
+  KimiAdapter,
 ];
 
 /**
