@@ -11,6 +11,7 @@ import { toMessagePrompt } from './adapters/base';
 import type { DomPrompt } from './adapters/base';
 import type { Message, AnyResponse } from '@/shared/messages';
 import type { PromptAdapter } from './adapters/base';
+import { flashHighlight } from './highlight';
 
 logger.debug('content: bootstrap', location.href);
 
@@ -69,6 +70,9 @@ browser.runtime.onMessage.addListener(
       const target = cachedPrompts.find((p) => p.id === msg.promptId);
       if (target && adapter) {
         adapter.scrollTo(target);
+        // Small delay so the scroll animation has started before the ring
+        // appears — prevents the flash from occurring offscreen.
+        setTimeout(() => flashHighlight(target.element), 300);
         return Promise.resolve({ ok: true });
       }
       return Promise.resolve({ ok: false });
