@@ -10,6 +10,7 @@ import { renderHeader, updateHeaderCount } from '../components/Header';
 import { renderPromptList } from '../components/PromptList';
 import { renderEmptyState } from '../components/EmptyState';
 import { createSearchBar, filterPrompts } from '../components/SearchBar';
+import { renderFooter } from '../components/Footer';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -32,16 +33,18 @@ async function sendToContent<T>(tabId: number, msg: Message): Promise<T | null> 
 export async function renderMainView(root: HTMLElement): Promise<void> {
   root.innerHTML = '';
 
-  // Skeleton: header container + search + body
+  // Skeleton: header container + search + body + footer
   const headerContainer = document.createElement('div');
   const searchContainer = document.createElement('div');
   searchContainer.className = 'app__search';
   const body = document.createElement('section');
   body.className = 'app__body';
+  const footerContainer = document.createElement('div');
 
   root.appendChild(headerContainer);
   root.appendChild(searchContainer);
   root.appendChild(body);
+  root.appendChild(footerContainer);
 
   renderHeader(headerContainer, {});
   renderEmptyState(body, { reason: 'loading' });
@@ -101,6 +104,11 @@ export async function renderMainView(root: HTMLElement): Promise<void> {
 
     renderList(prompts, currentQuery);
     updateHeaderCount(header, prompts.length, prompts.length);
+
+    // Footer: export menu (only when we have prompts)
+    if (prompts.length > 0) {
+      renderFooter(footerContainer, { prompts, platform });
+    }
   };
 
   await fetchAndRender();

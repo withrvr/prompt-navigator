@@ -235,6 +235,59 @@ body {
   padding: 0 1px;
 }
 
+/* ── Footer + export menu ────────────────────────────────────────────────── */
+
+.app__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: var(--pn-space-2) var(--pn-space-3);
+  border-top: 1px solid var(--pn-border);
+  background: var(--pn-surface);
+  flex-shrink: 0;
+  position: relative;
+}
+
+.app__btn--export {
+  font-size: var(--pn-font-sm);
+  padding: var(--pn-space-1) var(--pn-space-3);
+  background: var(--pn-surface-2);
+  border: 1px solid var(--pn-border);
+  border-radius: var(--pn-radius-sm);
+  color: var(--pn-text);
+  transition: background var(--pn-transition);
+}
+
+.app__btn--export:hover {
+  background: var(--pn-surface);
+  border-color: var(--pn-accent);
+}
+
+.export-menu {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  right: var(--pn-space-3);
+  background: var(--pn-surface);
+  border: 1px solid var(--pn-border);
+  border-radius: var(--pn-radius-md);
+  box-shadow: var(--pn-shadow-md);
+  min-width: 100px;
+  overflow: hidden;
+  z-index: 10;
+}
+
+.export-menu__item {
+  padding: var(--pn-space-2) var(--pn-space-4);
+  font-size: var(--pn-font-sm);
+  cursor: pointer;
+  transition: background var(--pn-transition);
+  color: var(--pn-text);
+}
+
+.export-menu__item:hover {
+  background: var(--pn-surface-2);
+}
+
 /* ── Empty state ─────────────────────────────────────────────────────────── */
 
 .empty-state {
