@@ -15,6 +15,8 @@ const SUPPORTED_HOSTS = [
   'https://chat.openai.com/*',
   'https://claude.ai/*',
   'https://gemini.google.com/*',
+  'https://www.perplexity.ai/*',
+  'https://perplexity.ai/*',
 ];
 
 export default defineManifest({

@@ -7,11 +7,13 @@ import type { PromptAdapter } from './base';
 import { ChatGptAdapter } from './chatgpt';
 import { ClaudeAdapter } from './claude';
 import { GeminiAdapter } from './gemini';
+import { PerplexityAdapter } from './perplexity';
 
 const ADAPTERS: PromptAdapter[] = [
   new ChatGptAdapter(),
   new ClaudeAdapter(),
   new GeminiAdapter(),
+  PerplexityAdapter,
 ];
 
 /**
