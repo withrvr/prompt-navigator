@@ -370,6 +370,51 @@ body {
   background: transparent;
 }
 
+/* Keyboard shortcut rows */
+.settings-kb-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--pn-space-1) var(--pn-space-2);
+  border-radius: var(--pn-radius-sm);
+}
+
+.settings-kb-row__label {
+  font-size: var(--pn-font-sm);
+  color: var(--pn-text);
+}
+
+.settings-kb-key {
+  min-width: 32px;
+  height: 28px;
+  padding: 0 var(--pn-space-2);
+  border: 1px solid var(--pn-border);
+  border-radius: var(--pn-radius-sm);
+  background: var(--pn-surface-2);
+  color: var(--pn-text);
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color var(--pn-transition), background var(--pn-transition);
+}
+
+.settings-kb-key:hover {
+  border-color: var(--pn-accent);
+}
+
+.settings-kb-key--listening {
+  border-color: var(--pn-accent);
+  background: var(--pn-surface);
+  color: var(--pn-text-muted);
+  animation: pn-pulse 0.8s ease-in-out infinite;
+}
+
+@keyframes pn-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+
 /* Info view */
 .info-brand {
   flex-direction: row !important;

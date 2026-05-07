@@ -40,10 +40,16 @@ export async function saveFavoritesOrdered(ordered: string[]): Promise<void> {
 export interface PnSettings {
   /** Whether to inject a floating navigator button on supported AI pages. */
   floatingButton: boolean;
+  /** Key bindings for in-popup actions. Defaults applied at runtime. */
+  shortcuts: {
+    copy: string;     // default 'c'
+    favorite: string; // default 'f'
+  };
 }
 
 const DEFAULT_SETTINGS: PnSettings = {
   floatingButton: false,
+  shortcuts: { copy: 'c', favorite: 'f' },
 };
 
 export async function getSettings(): Promise<PnSettings> {

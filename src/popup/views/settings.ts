@@ -96,6 +96,66 @@ async function renderSettingsAsync(
     </p>
   `;
 
+  // ── Keyboard shortcuts ────────────────────────────────────────────────
+  const kbSection = document.createElement('div');
+  kbSection.className = 'settings-section';
+  kbSection.innerHTML = `<h2 class="settings-section__title">Keyboard shortcuts</h2>`;
+
+  const kbDesc = document.createElement('p');
+  kbDesc.className = 'settings-section__body';
+  kbDesc.innerHTML =
+    'Always-on: <kbd>1</kbd>–<kbd>9</kbd> jump to prompt, <kbd>↑</kbd><kbd>↓</kbd> navigate list. ' +
+    'When a prompt is focused:';
+  kbSection.appendChild(kbDesc);
+
+  const kbRows: Array<{ label: string; key: keyof typeof settings.shortcuts }> = [
+    { label: 'Copy prompt', key: 'copy' },
+    { label: 'Toggle favorite', key: 'favorite' },
+  ];
+
+  for (const row of kbRows) {
+    const rowEl = document.createElement('div');
+    rowEl.className = 'settings-kb-row';
+
+    const labelEl = document.createElement('span');
+    labelEl.className = 'settings-kb-row__label';
+    labelEl.textContent = row.label;
+
+    const keyBtn = document.createElement('button');
+    keyBtn.className = 'settings-kb-key';
+    keyBtn.textContent = settings.shortcuts[row.key].toUpperCase();
+    keyBtn.setAttribute('title', 'Click to reassign');
+    let capturing = false;
+
+    keyBtn.addEventListener('click', () => {
+      if (capturing) return;
+      capturing = true;
+      keyBtn.textContent = '…';
+      keyBtn.classList.add('settings-kb-key--listening');
+
+      const onKey = (e: KeyboardEvent): void => {
+        e.preventDefault();
+        const newKey = e.key.toLowerCase();
+        // Only accept single printable keys
+        if (newKey.length === 1) {
+          settings.shortcuts[row.key] = newKey;
+          void saveSettings({ shortcuts: { ...settings.shortcuts } });
+          keyBtn.textContent = newKey.toUpperCase();
+        } else {
+          keyBtn.textContent = settings.shortcuts[row.key].toUpperCase();
+        }
+        keyBtn.classList.remove('settings-kb-key--listening');
+        capturing = false;
+        document.removeEventListener('keydown', onKey, { capture: true });
+      };
+      document.addEventListener('keydown', onKey, { capture: true, once: true });
+    });
+
+    rowEl.appendChild(labelEl);
+    rowEl.appendChild(keyBtn);
+    kbSection.appendChild(rowEl);
+  }
+
   // ── Favorites ──────────────────────────────────────────────────────────
   const favsSection = document.createElement('div');
   favsSection.className = 'settings-section';
@@ -107,6 +167,7 @@ async function renderSettingsAsync(
   favsSection.appendChild(favsLink);
 
   body.appendChild(themeSection);
+  body.appendChild(kbSection);
   body.appendChild(floatSection);
   body.appendChild(favsSection);
   body.appendChild(supportSection);

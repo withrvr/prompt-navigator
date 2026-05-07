@@ -11,7 +11,8 @@ import { renderPromptList } from '../components/PromptList';
 import { renderEmptyState, buildReportUrl } from '../components/EmptyState';
 import { createSearchBar, filterPrompts, filterFavorites } from '../components/SearchBar';
 import { renderFooter } from '../components/Footer';
-import { getFavorites } from '@/shared/storage';
+import { getFavorites, getSettings } from '@/shared/storage';
+import { registerKeyboardShortcuts } from '../keyboard';
 import type { ViewName } from '../popup';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -79,6 +80,7 @@ export async function renderMainView(
     let favorites = await getFavorites();
     let selectionMode = false;
     const selectedIds = new Set<string>();
+    const settings = await getSettings();
 
     const header = renderHeader(headerContainer, {
       count: prompts.length,
@@ -170,6 +172,28 @@ export async function renderMainView(
 
     await applyFilters();
     refreshFooter();
+
+    // Register keyboard shortcuts after the first render
+    const disposeKeys = registerKeyboardShortcuts({
+      getItems: () => body.querySelectorAll<HTMLElement>('.prompt-item'),
+      onJump: (idx) => {
+        const visiblePrompts = body.querySelectorAll<HTMLElement>('.prompt-item');
+        const item = visiblePrompts[idx];
+        if (!item) return;
+        const id = item.getAttribute('data-prompt-id');
+        if (id) void sendToContent(tabId, { type: 'SCROLL_TO', promptId: id }).then(() => window.close());
+      },
+      shortcuts: settings.shortcuts,
+    });
+
+    // Dispose shortcuts when the view is replaced
+    const observer = new MutationObserver(() => {
+      if (!document.contains(body)) {
+        disposeKeys();
+        observer.disconnect();
+      }
+    });
+    observer.observe(root, { childList: true });
   };
 
   await fetchAndRender();
