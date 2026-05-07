@@ -8,10 +8,11 @@ import type { Message } from '@/shared/messages';
 import type { Prompt, PromptsResponse } from '@/shared/types';
 import { renderHeader, updateHeaderCount } from '../components/Header';
 import { renderPromptList } from '../components/PromptList';
-import { renderEmptyState } from '../components/EmptyState';
+import { renderEmptyState, buildReportUrl } from '../components/EmptyState';
 import { createSearchBar, filterPrompts, filterFavorites } from '../components/SearchBar';
 import { renderFooter } from '../components/Footer';
-import { getFavorites } from '@/shared/storage';
+import { getFavorites, getSettings } from '@/shared/storage';
+import { registerKeyboardShortcuts } from '../keyboard';
 import type { ViewName } from '../popup';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -70,19 +71,39 @@ export async function renderMainView(
       return;
     }
 
-    const { prompts, platform } = response;
+    const { prompts, platform, url: pageUrl } = response;
     logger.debug('popup: got', prompts.length, 'prompts from', platform);
 
     // Local view state
     let currentQuery = '';
     let favoritesOnly = false;
     let favorites = await getFavorites();
+    let selectionMode = false;
+    const selectedIds = new Set<string>();
+    const settings = await getSettings();
 
     const header = renderHeader(headerContainer, {
       count: prompts.length,
       onRefresh: () => void fetchAndRender(),
       onSettings: () => navigate('settings'),
     });
+
+    const refreshFooter = (): void => {
+      if (prompts.length > 0) {
+        renderFooter(footerContainer, {
+          prompts,
+          platform,
+          selectionMode,
+          selectedIds,
+          onToggleSelectionMode: () => {
+            selectionMode = !selectionMode;
+            if (!selectionMode) selectedIds.clear();
+            void applyFilters();
+            refreshFooter();
+          },
+        });
+      }
+    };
 
     const applyFilters = async (): Promise<void> => {
       let list = prompts;
@@ -101,7 +122,6 @@ export async function renderMainView(
         },
         onToggleFavorites: async (active) => {
           favoritesOnly = active;
-          // Re-read favorites in case the user starred something this session
           favorites = await getFavorites();
           void applyFilters();
         },
@@ -126,6 +146,12 @@ export async function renderMainView(
           });
           return;
         }
+        const isKnown = platform !== 'unknown';
+        renderEmptyState(body, {
+          reason: 'no-prompts',
+          reportUrl: isKnown ? buildReportUrl(platform, pageUrl) : undefined,
+        });
+        return;
       }
       await renderPromptList(body, {
         prompts: list,
@@ -134,14 +160,40 @@ export async function renderMainView(
           window.close();
         },
         highlight: query,
+        selectionMode,
+        selectedIds,
+        onSelect: (id, sel) => {
+          if (sel) selectedIds.add(id);
+          else selectedIds.delete(id);
+          refreshFooter();
+        },
       });
     };
 
     await applyFilters();
+    refreshFooter();
 
-    if (prompts.length > 0) {
-      renderFooter(footerContainer, { prompts, platform });
-    }
+    // Register keyboard shortcuts after the first render
+    const disposeKeys = registerKeyboardShortcuts({
+      getItems: () => body.querySelectorAll<HTMLElement>('.prompt-item'),
+      onJump: (idx) => {
+        const visiblePrompts = body.querySelectorAll<HTMLElement>('.prompt-item');
+        const item = visiblePrompts[idx];
+        if (!item) return;
+        const id = item.getAttribute('data-prompt-id');
+        if (id) void sendToContent(tabId, { type: 'SCROLL_TO', promptId: id }).then(() => window.close());
+      },
+      shortcuts: settings.shortcuts,
+    });
+
+    // Dispose shortcuts when the view is replaced
+    const observer = new MutationObserver(() => {
+      if (!document.contains(body)) {
+        disposeKeys();
+        observer.disconnect();
+      }
+    });
+    observer.observe(root, { childList: true });
   };
 
   await fetchAndRender();

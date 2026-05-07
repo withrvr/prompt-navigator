@@ -30,14 +30,22 @@
 - `Alt+P` keyboard shortcut to open popup
 - 57 unit tests total (32 new tests in v1.1)
 
+## ✅ Done — v1.2 (`claude/v1.2-backlog`)
+
+- Per-platform "report broken selector" quick-link (pre-filled GitHub issue)
+- Bulk export: select individual prompts then export only those
+- Optional in-page floating navigator button (off by default, shadow-DOM isolated iframe panel)
+- Drag-to-reorder favorites list (HTML5 drag-and-drop, persisted order)
+- Custom keyboard shortcuts per action (1–9 jump, ↑↓ navigate, c/f configurable)
+- Safari Web Extension build script (`npm run build:safari`, macOS + Xcode)
+- i18n foundation: typed `Strings` interface + `t(key)` lookup, English locale table
+
 ## 🌌 Backlog
 
-- Optional in-page floating navigator button (off by default)
-- AI-generated summary/title per prompt cluster
+- AI-generated summary/title per prompt cluster (heuristic or LLM API)
 - Conversation switcher across recent chats
-- Internationalization (i18n)
-- Safari packaging via Xcode wrapper
-- Per-platform "report broken selector" quick-link
-- Custom keyboard shortcuts per action (copy, favorite, jump-to-N)
-- Bulk export (selected prompts only)
-- Drag-to-reorder favorites list
+- Full i18n migration: wire `t()` into all remaining UI components
+- Additional locale tables (e.g. `fr`, `de`, `zh`, `ja`)
+- Per-platform "report broken selector" — also shown from the Info view
+- Bulk export: "select all" / "select none" buttons
+- Safari App Store submission guide

@@ -7,8 +7,9 @@ import { applyStoredTheme } from './theme';
 import { renderMainView } from './views/main';
 import { renderSettingsView } from './views/settings';
 import { renderInfoView } from './views/info';
+import { renderFavoritesView } from './views/favorites';
 
-export type ViewName = 'main' | 'settings' | 'info';
+export type ViewName = 'main' | 'settings' | 'info' | 'favorites';
 
 let root: HTMLElement;
 
@@ -19,10 +20,13 @@ export function navigate(view: ViewName): void {
       void renderMainView(root, navigate);
       break;
     case 'settings':
-      renderSettingsView(root, () => navigate('main'));
+      renderSettingsView(root, () => navigate('main'), navigate);
       break;
     case 'info':
       renderInfoView(root, () => navigate('main'));
+      break;
+    case 'favorites':
+      void renderFavoritesView(root, () => navigate('main'));
       break;
   }
 }
