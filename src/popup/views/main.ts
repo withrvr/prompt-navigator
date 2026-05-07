@@ -1,14 +1,15 @@
-// Main popup view. Queries the active tab's content script for user prompts
-// and renders them as a clickable list. Clicking a prompt sends a SCROLL_TO
-// message back so the page scrolls to that turn.
+// Main popup view. Fetches user prompts from the active tab, then provides
+// live search, a prompt count, and a refresh button. Clicking any prompt
+// sends SCROLL_TO to the content script and closes the popup.
 
 import browser from '@/shared/browser';
 import { logger } from '@/shared/logger';
 import type { Message } from '@/shared/messages';
-import type { PromptsResponse } from '@/shared/types';
+import type { Prompt, PromptsResponse } from '@/shared/types';
 import { renderHeader, updateHeaderCount } from '../components/Header';
 import { renderPromptList } from '../components/PromptList';
 import { renderEmptyState } from '../components/EmptyState';
+import { createSearchBar, filterPrompts } from '../components/SearchBar';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -31,46 +32,76 @@ async function sendToContent<T>(tabId: number, msg: Message): Promise<T | null> 
 export async function renderMainView(root: HTMLElement): Promise<void> {
   root.innerHTML = '';
 
-  // Skeleton: header + body
+  // Skeleton: header container + search + body
   const headerContainer = document.createElement('div');
+  const searchContainer = document.createElement('div');
+  searchContainer.className = 'app__search';
   const body = document.createElement('section');
   body.className = 'app__body';
 
   root.appendChild(headerContainer);
+  root.appendChild(searchContainer);
   root.appendChild(body);
 
   renderHeader(headerContainer, {});
   renderEmptyState(body, { reason: 'loading' });
 
-  // ── Fetch prompts from content script ──────────────────────────────────
+  // ── Fetch prompts ──────────────────────────────────────────────────────
   const tabId = await getActiveTabId();
   if (tabId === null) {
     renderEmptyState(body, { reason: 'error', detail: 'No active tab found.' });
     return;
   }
 
-  const response = await sendToContent<PromptsResponse>(tabId, { type: 'GET_PROMPTS' });
+  const fetchAndRender = async (): Promise<void> => {
+    renderEmptyState(body, { reason: 'loading' });
+    const response = await sendToContent<PromptsResponse>(tabId, { type: 'GET_PROMPTS' });
 
-  if (!response) {
-    // Content script isn't running — likely an unsupported page or the
-    // script hasn't loaded yet.
-    renderHeader(headerContainer, {});
-    renderEmptyState(body, { reason: 'unsupported' });
-    return;
-  }
+    if (!response) {
+      renderHeader(headerContainer, {});
+      searchContainer.innerHTML = '';
+      renderEmptyState(body, { reason: 'unsupported' });
+      return;
+    }
 
-  const { prompts, platform } = response;
-  logger.debug('popup: got', prompts.length, 'prompts from', platform);
+    const { prompts, platform } = response;
+    logger.debug('popup: got', prompts.length, 'prompts from', platform);
 
-  const header = renderHeader(headerContainer, { count: prompts.length });
+    let currentQuery = '';
 
-  // ── Navigate handler ───────────────────────────────────────────────────
-  async function onNavigate(promptId: string): Promise<void> {
-    await sendToContent(tabId!, { type: 'SCROLL_TO', promptId });
-    // Close the popup so the user can see the page scroll to the prompt.
-    window.close();
-  }
+    const header = renderHeader(headerContainer, {
+      count: prompts.length,
+      onRefresh: () => void fetchAndRender(),
+    });
 
-  renderPromptList(body, { prompts, onNavigate });
-  updateHeaderCount(header, prompts.length);
+    // Search bar
+    searchContainer.innerHTML = '';
+    if (prompts.length > 0) {
+      const bar = createSearchBar({
+        onSearch: (q) => {
+          currentQuery = q;
+          const filtered = filterPrompts(prompts, q);
+          renderList(filtered, q);
+          updateHeaderCount(header, filtered.length, prompts.length);
+        },
+      });
+      searchContainer.appendChild(bar);
+    }
+
+    const renderList = (list: Prompt[], query: string): void => {
+      renderPromptList(body, {
+        prompts: list,
+        onNavigate: async (promptId) => {
+          await sendToContent(tabId, { type: 'SCROLL_TO', promptId });
+          window.close();
+        },
+        highlight: query,
+      });
+    };
+
+    renderList(prompts, currentQuery);
+    updateHeaderCount(header, prompts.length, prompts.length);
+  };
+
+  await fetchAndRender();
 }
