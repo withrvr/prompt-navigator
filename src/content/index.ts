@@ -12,6 +12,8 @@ import type { DomPrompt } from './adapters/base';
 import type { Message, AnyResponse } from '@/shared/messages';
 import type { PromptAdapter } from './adapters/base';
 import { flashHighlight } from './highlight';
+import { injectFloatingButton, removeFloatingButton } from './floating-button';
+import { getSettings } from '@/shared/storage';
 
 logger.debug('content: bootstrap', location.href);
 
@@ -99,10 +101,27 @@ const navObserver = new MutationObserver(() => {
 
 navObserver.observe(document.body, { childList: true, subtree: true });
 
+// ── Floating button ────────────────────────────────────────────────────────
+
+async function syncFloatingButton(): Promise<void> {
+  const { floatingButton } = await getSettings();
+  if (floatingButton) {
+    injectFloatingButton();
+  } else {
+    removeFloatingButton();
+  }
+}
+
+// Keep the button in sync if the user changes the setting while on the page.
+browser.storage.onChanged.addListener((changes) => {
+  if ('pn:settings' in changes) void syncFloatingButton();
+});
+
 // ── Boot ───────────────────────────────────────────────────────────────────
 
 try {
   init();
+  void syncFloatingButton();
 } catch (err) {
   logger.error('content: init failed', err);
 }

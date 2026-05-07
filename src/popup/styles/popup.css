@@ -328,6 +328,33 @@ body {
   font-size: var(--pn-font-sm);
 }
 
+/* Checkbox toggle row (floating button, etc.) */
+.settings-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--pn-space-2);
+  cursor: pointer;
+  padding: var(--pn-space-1) var(--pn-space-2);
+  border-radius: var(--pn-radius-sm);
+  transition: background var(--pn-transition);
+}
+
+.settings-toggle:hover {
+  background: var(--pn-surface-2);
+}
+
+.settings-toggle__input {
+  accent-color: var(--pn-accent);
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.settings-toggle__label {
+  font-size: var(--pn-font-sm);
+}
+
 /* Info view */
 .info-brand {
   flex-direction: row !important;

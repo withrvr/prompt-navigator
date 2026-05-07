@@ -8,6 +8,38 @@ import browser from './browser';
 import { logger } from './logger';
 
 const FAVORITES_KEY = 'pn:favorites';
+const SETTINGS_KEY = 'pn:settings';
+
+// ── App Settings ───────────────────────────────────────────────────────────
+
+export interface PnSettings {
+  /** Whether to inject a floating navigator button on supported AI pages. */
+  floatingButton: boolean;
+}
+
+const DEFAULT_SETTINGS: PnSettings = {
+  floatingButton: false,
+};
+
+export async function getSettings(): Promise<PnSettings> {
+  try {
+    const result = await browser.storage.local.get(SETTINGS_KEY);
+    const raw = result[SETTINGS_KEY] as Partial<PnSettings> | undefined;
+    return { ...DEFAULT_SETTINGS, ...raw };
+  } catch (err) {
+    logger.warn('storage: getSettings failed', err);
+    return { ...DEFAULT_SETTINGS };
+  }
+}
+
+export async function saveSettings(patch: Partial<PnSettings>): Promise<void> {
+  try {
+    const current = await getSettings();
+    await browser.storage.local.set({ [SETTINGS_KEY]: { ...current, ...patch } });
+  } catch (err) {
+    logger.warn('storage: saveSettings failed', err);
+  }
+}
 
 // ── Favorites ──────────────────────────────────────────────────────────────
 // Favorites are stored as a Set of prompt texts (not IDs, which are

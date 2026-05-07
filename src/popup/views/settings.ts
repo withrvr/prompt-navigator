@@ -1,8 +1,14 @@
-// Settings view. Covers: theme preference, export format preference, reset.
+// Settings view. Covers: theme preference, floating button, support link.
 
 import { getStoredTheme, setStoredTheme, applyTheme, themeLabel, type ThemePreference } from '../theme';
+import { getSettings, saveSettings } from '@/shared/storage';
 
 export function renderSettingsView(root: HTMLElement, onBack: () => void): void {
+  void renderSettingsAsync(root, onBack);
+}
+
+async function renderSettingsAsync(root: HTMLElement, onBack: () => void): Promise<void> {
+  const settings = await getSettings();
   root.innerHTML = '';
 
   const header = document.createElement('header');
@@ -44,6 +50,32 @@ export function renderSettingsView(root: HTMLElement, onBack: () => void): void 
 
   themeSection.appendChild(themeGroup);
 
+  // ── Floating button ────────────────────────────────────────────────────
+  const floatSection = document.createElement('div');
+  floatSection.className = 'settings-section';
+  floatSection.innerHTML = `
+    <h2 class="settings-section__title">In-page panel</h2>
+  `;
+
+  const floatLabel = document.createElement('label');
+  floatLabel.className = 'settings-toggle';
+  floatLabel.innerHTML = `
+    <input type="checkbox" class="settings-toggle__input" ${settings.floatingButton ? 'checked' : ''} />
+    <span class="settings-toggle__label">🧭 Show floating navigator button</span>
+  `;
+  floatLabel.querySelector('input')!.addEventListener('change', (e) => {
+    const checked = (e.target as HTMLInputElement).checked;
+    void saveSettings({ floatingButton: checked });
+  });
+
+  const floatHint = document.createElement('p');
+  floatHint.className = 'settings-section__body';
+  floatHint.textContent =
+    'Adds a 🧭 button to supported AI pages. Click it to open a floating prompt list panel. Off by default.';
+
+  floatSection.appendChild(floatLabel);
+  floatSection.appendChild(floatHint);
+
   // ── Support ────────────────────────────────────────────────────────────
   const supportSection = document.createElement('div');
   supportSection.className = 'settings-section';
@@ -56,6 +88,7 @@ export function renderSettingsView(root: HTMLElement, onBack: () => void): void 
   `;
 
   body.appendChild(themeSection);
+  body.appendChild(floatSection);
   body.appendChild(supportSection);
   root.appendChild(header);
   root.appendChild(body);
