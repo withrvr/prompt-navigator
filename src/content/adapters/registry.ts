@@ -8,12 +8,14 @@ import { ChatGptAdapter } from './chatgpt';
 import { ClaudeAdapter } from './claude';
 import { GeminiAdapter } from './gemini';
 import { PerplexityAdapter } from './perplexity';
+import { GrokAdapter } from './grok';
 
 const ADAPTERS: PromptAdapter[] = [
   new ChatGptAdapter(),
   new ClaudeAdapter(),
   new GeminiAdapter(),
   PerplexityAdapter,
+  new GrokAdapter(),
 ];
 
 /**

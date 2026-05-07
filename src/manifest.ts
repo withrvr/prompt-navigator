@@ -17,6 +17,9 @@ const SUPPORTED_HOSTS = [
   'https://gemini.google.com/*',
   'https://www.perplexity.ai/*',
   'https://perplexity.ai/*',
+  'https://grok.com/*',
+  'https://www.grok.com/*',
+  'https://x.com/i/grok*',
 ];
 
 export default defineManifest({
