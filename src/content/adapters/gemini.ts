@@ -1,19 +1,16 @@
 // Gemini adapter (gemini.google.com).
 //
-// Gemini renders user turns as <user-query> custom elements. The text lives
-// inside a .query-text or .user-query-content child depending on the
-// Gemini version. We try both, then fall back to the element's own
-// innerText so a minor DOM tweak doesn't break extraction entirely.
+// User turns are rendered as <user-query> custom elements. The text lives
+// inside a .query-text or .user-query-content child depending on the Gemini
+// version. We try both, then fall back to the element's own text content.
 
 import type { DomPrompt, PromptAdapter } from './base';
 import { observeDom } from '@/content/observer';
 import { safeScrollTo } from '@/content/scroll';
+import { extractText } from './extract';
 import type { PlatformId } from '@/shared/types';
 
-// Primary selector — the custom element wrapping each user turn.
 const USER_QUERY_SELECTOR = 'user-query';
-
-// Inner text selectors tried in order (most specific first).
 const TEXT_CHILD_SELECTORS = ['.query-text', '.user-query-content', 'p'];
 
 export class GeminiAdapter implements PromptAdapter {
@@ -28,7 +25,7 @@ export class GeminiAdapter implements PromptAdapter {
     const prompts: DomPrompt[] = [];
 
     nodes.forEach((el, index) => {
-      const text = extractText(el);
+      const text = extractGeminiText(el);
       if (!text) return;
       prompts.push({
         id: `gemini-${index}`,
@@ -51,11 +48,13 @@ export class GeminiAdapter implements PromptAdapter {
   }
 }
 
-function extractText(el: HTMLElement): string {
+function extractGeminiText(el: HTMLElement): string {
   for (const sel of TEXT_CHILD_SELECTORS) {
     const child = el.querySelector<HTMLElement>(sel);
-    if (child?.innerText?.trim()) return child.innerText.trim();
+    if (child) {
+      const t = extractText(child);
+      if (t) return t;
+    }
   }
-  // Last resort: use the whole element's text (may include toolbar buttons)
-  return el.innerText?.trim() ?? '';
+  return extractText(el);
 }

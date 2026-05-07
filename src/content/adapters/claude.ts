@@ -11,6 +11,7 @@
 import type { DomPrompt, PromptAdapter } from './base';
 import { observeDom } from '@/content/observer';
 import { safeScrollTo } from '@/content/scroll';
+import { extractText } from './extract';
 import type { PlatformId } from '@/shared/types';
 
 const USER_MESSAGE_SELECTOR = '[data-testid="user-message"]';
@@ -27,7 +28,7 @@ export class ClaudeAdapter implements PromptAdapter {
     const prompts: DomPrompt[] = [];
 
     nodes.forEach((el, index) => {
-      const text = el.innerText?.trim() ?? '';
+      const text = extractText(el);
       if (!text) return;
       prompts.push({
         id: `claude-${index}`,

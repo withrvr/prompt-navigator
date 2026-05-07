@@ -8,6 +8,7 @@
 import type { DomPrompt, PromptAdapter } from './base';
 import { observeDom } from '@/content/observer';
 import { safeScrollTo } from '@/content/scroll';
+import { extractText } from './extract';
 import type { PlatformId } from '@/shared/types';
 
 const USER_ROLE_SELECTOR = '[data-message-author-role="user"]';
@@ -25,7 +26,7 @@ export class ChatGptAdapter implements PromptAdapter {
     const prompts: DomPrompt[] = [];
 
     nodes.forEach((el, index) => {
-      const text = extractText(el);
+      const text = extractText(el as HTMLElement);
       if (!text) return;
       prompts.push({
         id: `chatgpt-${index}`,
@@ -48,9 +49,3 @@ export class ChatGptAdapter implements PromptAdapter {
   }
 }
 
-/** Extract visible text content from a user-turn element. */
-function extractText(el: HTMLElement): string {
-  // ChatGPT wraps the actual message in a nested div; innerText gives the
-  // human-readable content (respects br → newline, collapses CSS-hidden).
-  return el.innerText?.trim() ?? '';
-}
