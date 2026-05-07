@@ -20,6 +20,7 @@ const SUPPORTED_HOSTS = [
   'https://grok.com/*',
   'https://www.grok.com/*',
   'https://x.com/i/grok*',
+  'https://chat.deepseek.com/*',
 ];
 
 export default defineManifest({

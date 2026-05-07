@@ -9,6 +9,7 @@ import { ClaudeAdapter } from './claude';
 import { GeminiAdapter } from './gemini';
 import { PerplexityAdapter } from './perplexity';
 import { GrokAdapter } from './grok';
+import { DeepSeekAdapter } from './deepseek';
 
 const ADAPTERS: PromptAdapter[] = [
   new ChatGptAdapter(),
@@ -16,6 +17,7 @@ const ADAPTERS: PromptAdapter[] = [
   new GeminiAdapter(),
   PerplexityAdapter,
   new GrokAdapter(),
+  DeepSeekAdapter,
 ];
 
 /**
