@@ -292,6 +292,18 @@ body {
   text-decoration: underline;
 }
 
+.settings-section__body kbd,
+.settings-section__body code {
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 11px;
+  padding: 1px 5px;
+  border-radius: var(--pn-radius-sm);
+  background: var(--pn-surface-2);
+  border: 1px solid var(--pn-border);
+  color: var(--pn-text);
+  white-space: nowrap;
+}
+
 .settings-radio-group {
   display: flex;
   flex-direction: column;
