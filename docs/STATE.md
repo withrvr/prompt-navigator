@@ -4,29 +4,45 @@
 
 ## Now
 
-**Phase 1 — Scaffold.** Project bootstrapped: Vite + TS + @crxjs, MV3 manifest as TS, popup skeleton with theme tokens (auto/dark/light, purple accent), background service worker stub, content script stub, dev/prod-aware logger, ESLint + Prettier, CI workflow, README/CONTRIBUTING/ARCHITECTURE/ROADMAP, generated icon set.
+**v1 complete.** All 16 phases shipped.
 
-## Next
+## What's done
 
-**Phase 2 — Adapter foundation + ChatGPT adapter.**
+| Phase | Deliverable |
+|---|---|
+| 1 | Scaffold: Vite + TS + @crxjs, manifest, popup skeleton, theme tokens, docs, CI |
+| 2 | ChatGPT adapter + content script messaging + popup list |
+| 3 | Click-to-navigate + purple flash highlight (safe scroll, no scrollIntoView) |
+| 4 | Claude adapter (`[data-testid="user-message"]`, avoids scrollIntoView) |
+| 5 | Gemini adapter (`<user-query>` custom element, child selector fallback) |
+| 6 | Search / filter (live, case-insensitive, match highlight), count, refresh 🔄 |
+| 7 | Theme system: auto/dark/light, purple accent (#9146FF), persisted |
+| 8 | Favorites ⭐ (browser.storage.local) + copy 📋 (clipboard API) |
+| 9 | Export: JSON · CSV · PDF (iframe print dialog) |
+| 10 | Settings view + Info view + in-process view router |
+| 11 | Non-happy path states: loading, no-prompts, no-match, unsupported, error |
+| 12 | Dev/prod logger (silent in production builds) — shipped with phase 1 |
+| 13 | Firefox build target (`scripts/build-firefox.ts` → `dist-firefox/`) |
+| 14 | 25 Vitest unit tests (adapters + exporters, jsdom env, path aliases) |
+| 15 | README: install steps, usage guide, feature table, store badge placeholders |
+| 16 | `scripts/package-zip.ts` → `dist/chrome.zip` + `dist-firefox/firefox.zip` |
 
-- Define `PromptAdapter` interface in `src/content/adapters/base.ts`.
-- Build the adapter registry (`src/content/adapters/registry.ts`).
-- Implement the ChatGPT adapter (`[data-message-author-role="user"]`).
-- Wire the content script: adapter selection → MutationObserver → message handler.
-- Wire the popup: on open, `runtime.sendMessage` → `GET_PROMPTS` → render list.
+## Next (v1.1)
 
-## How to run what we have so far
+Add secondary adapters — one commit each:
+
+- Perplexity (`perplexity.ai`)
+- Grok (`grok.com`, `x.com/i/grok`)
+- DeepSeek (`chat.deepseek.com`)
+- Mistral / Le Chat (`chat.mistral.ai`)
+- Kimi (`kimi.com`)
+- Meta AI (`meta.ai`)
+
+Then: submit to Chrome Web Store + Mozilla AMO.
+
+## How to run locally
 
 ```bash
-npm install
-npm run build
-# Load `dist/` as an unpacked extension in Chrome.
-# Click the icon — should see the brand header + a hint, themed by your OS.
+npm install && npm run build
+# Load dist/ as unpacked extension in Chrome dev mode
 ```
-
-## Notes captured during phase 1
-
-- `webextension-polyfill` + `@crxjs/vite-plugin` is the lowest-friction MV3 stack today.
-- Avoiding `<all_urls>` in `host_permissions` keeps the store review easy; we add hosts as adapters land.
-- Theme tokens live in `src/popup/styles/tokens.css` (sizes/spacing) + `theme.css` (colors).

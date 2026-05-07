@@ -2,51 +2,43 @@
 
 > Living document. Move items as they ship.
 
-## ✅ Done
+## ✅ Done (v1)
 
-- _(none yet — scaffold in progress)_
+- Scaffold: Vite + TS + @crxjs, MV3 manifest, popup, icons, CI
+- ChatGPT adapter (`[data-message-author-role="user"]`)
+- Click-to-navigate + purple flash highlight
+- Claude adapter (`[data-testid="user-message"]`)
+- Gemini adapter (`<user-query>` custom element)
+- Live search + match highlight + count + refresh
+- Auto/Dark/Light theme (purple accent, eye-friendly)
+- Favorites ⭐ (persisted) + copy 📋
+- Export: JSON · CSV · PDF
+- Settings view + Info view + view router
+- Non-happy path states (loading / no-prompts / no-match / unsupported / error)
+- Firefox build target
+- 25 unit tests (Vitest + jsdom)
+- Packaging scripts (`chrome.zip`, `firefox.zip`)
 
-## 🚧 In progress
+## 🔜 v1.1 — Secondary adapters
 
-- **Phase 1 — Scaffold**: Vite + TS + @crxjs, manifest, popup skeleton, theme tokens, docs, CI, icon set.
+Each is one commit: copy `chatgpt.ts` template, fill selectors, add fixture + test, register.
 
-## ⏳ v1 (store-ready)
-
-| # | Phase | Notes |
+| Platform | Host | Status |
 |---|---|---|
-| 2 | Adapter foundation + ChatGPT | `PromptAdapter` interface, registry, content script wiring, popup list. |
-| 3 | Click to navigate | Safe scroll util + flash highlight. |
-| 4 | Claude adapter | `[data-testid="user-message"]`. Avoid `scrollIntoView`. |
-| 5 | Gemini adapter | `user-query` element. |
-| 6 | Search + count + refresh | Live filter, total/match counter, manual refresh. |
-| 7 | Theme system | Auto / Light / Dark + toggle UI. |
-| 8 | Favorites + copy | ⭐ + 📋 per item, persisted. |
-| 9 | Export | JSON / CSV / PDF (jsPDF). |
-| 10 | Settings + Info views | Theme, export prefs, version, support link. |
-| 11 | Non-happy paths | Unsupported site, no prompts, error states. |
-| 12 | Logging | Dev-verbose, prod-silent logger. |
-| 13 | Firefox build | Gecko-flavored manifest + build script. |
-| 14 | Tests | Vitest for ChatGPT/Claude/Gemini adapters + exporters. |
-| 15 | Docs polish | README screenshots, CONTRIBUTING, store listing copy. |
-| 16 | Store packaging | `dist/chrome.zip` + `dist/firefox.zip`. |
+| Perplexity | `perplexity.ai` | pending |
+| Grok | `grok.com`, `x.com` | pending |
+| DeepSeek | `chat.deepseek.com` | pending |
+| Mistral | `chat.mistral.ai` | pending |
+| Kimi | `kimi.com` | pending |
+| Meta AI | `meta.ai` | pending |
 
-## 🔜 v1.1 — secondary adapters
+## 🌌 Backlog
 
-Each is one commit: copy `chatgpt.ts`, fill selectors, add fixture, register, add host.
-
-- Perplexity (`perplexity.ai`)
-- Grok (`grok.com`, `x.com/i/grok`)
-- DeepSeek (`chat.deepseek.com`)
-- Mistral / Le Chat (`chat.mistral.ai`)
-- Kimi (`kimi.com`)
-- Meta AI (`meta.ai`)
-
-## 🌌 Backlog (future)
-
-- Optional in-page floating navigator button (off by default).
-- Keyboard shortcut (e.g. `Alt+P`) to open popup.
-- AI-generated summary/title per prompt cluster.
-- Conversation switcher across recent chats.
-- Internationalization (i18n).
-- Safari packaging via Xcode wrapper.
-- Per-platform "report broken selector" support form.
+- Optional in-page floating navigator button (off by default)
+- Keyboard shortcut (e.g. `Alt+P`) to open popup
+- AI-generated summary/title per prompt cluster
+- Conversation switcher across recent chats
+- Internationalization (i18n)
+- Safari packaging via Xcode wrapper
+- Per-platform "report broken selector" quick-link
+- Favorites filter toggle (show only starred)
