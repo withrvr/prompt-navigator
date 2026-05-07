@@ -21,6 +21,7 @@ const SUPPORTED_HOSTS = [
   'https://www.grok.com/*',
   'https://x.com/i/grok*',
   'https://chat.deepseek.com/*',
+  'https://chat.mistral.ai/*',
 ];
 
 export default defineManifest({
