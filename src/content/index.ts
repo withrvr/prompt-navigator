@@ -101,4 +101,8 @@ navObserver.observe(document.body, { childList: true, subtree: true });
 
 // ── Boot ───────────────────────────────────────────────────────────────────
 
-init();
+try {
+  init();
+} catch (err) {
+  logger.error('content: init failed', err);
+}

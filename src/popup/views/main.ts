@@ -93,6 +93,10 @@ export async function renderMainView(
     }
 
     const renderList = async (list: Prompt[], query: string): Promise<void> => {
+      if (list.length === 0 && query.trim()) {
+        renderEmptyState(body, { reason: 'no-match' });
+        return;
+      }
       await renderPromptList(body, {
         prompts: list,
         onNavigate: async (promptId) => {
