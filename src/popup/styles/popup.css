@@ -386,6 +386,21 @@ body {
   padding: 0 1px;
 }
 
+/* ── Bulk-select checkbox ────────────────────────────────────────────────── */
+
+.prompt-item__checkbox {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--pn-accent);
+  margin-top: 3px;
+}
+
+.prompt-item--selected {
+  background: var(--pn-surface-2);
+}
+
 /* ── Footer + export menu ────────────────────────────────────────────────── */
 
 .app__footer {
@@ -397,6 +412,27 @@ body {
   background: var(--pn-surface);
   flex-shrink: 0;
   position: relative;
+}
+
+.app__btn--select {
+  font-size: var(--pn-font-sm);
+  padding: var(--pn-space-1) var(--pn-space-3);
+  background: var(--pn-surface-2);
+  border: 1px solid var(--pn-border);
+  border-radius: var(--pn-radius-sm);
+  color: var(--pn-text-muted);
+  transition: background var(--pn-transition), color var(--pn-transition);
+  margin-right: auto;
+}
+
+.app__btn--select:hover {
+  background: var(--pn-surface);
+  color: var(--pn-text);
+}
+
+.app__btn--select-active {
+  color: var(--pn-accent);
+  border-color: var(--pn-accent);
 }
 
 .app__btn--export {

@@ -9,6 +9,9 @@ export interface PromptListOptions {
   prompts: Prompt[];
   onNavigate: (id: string) => void;
   highlight?: string;
+  selectionMode?: boolean;
+  selectedIds?: Set<string>;
+  onSelect?: (id: string, selected: boolean) => void;
 }
 
 /** Renders (or re-renders) the prompt list into `container`. */
@@ -16,7 +19,10 @@ export async function renderPromptList(
   container: HTMLElement,
   opts: PromptListOptions,
 ): Promise<void> {
-  const { prompts, onNavigate, highlight } = opts;
+  const {
+    prompts, onNavigate, highlight,
+    selectionMode = false, selectedIds = new Set(), onSelect,
+  } = opts;
   container.innerHTML = '';
 
   if (prompts.length === 0) {
@@ -29,6 +35,7 @@ export async function renderPromptList(
   const ul = document.createElement('ul');
   ul.className = 'prompt-list';
   ul.setAttribute('aria-label', 'User prompts');
+  if (selectionMode) ul.classList.add('prompt-list--select-mode');
 
   for (const prompt of prompts) {
     ul.appendChild(
@@ -38,6 +45,9 @@ export async function renderPromptList(
         highlight,
         isFavorite: favorites.has(prompt.text),
         onFavorite: toggleFavorite,
+        selectionMode,
+        selected: selectedIds.has(prompt.id),
+        onSelect,
       }),
     );
   }

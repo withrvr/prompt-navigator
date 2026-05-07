@@ -77,12 +77,31 @@ export async function renderMainView(
     let currentQuery = '';
     let favoritesOnly = false;
     let favorites = await getFavorites();
+    let selectionMode = false;
+    const selectedIds = new Set<string>();
 
     const header = renderHeader(headerContainer, {
       count: prompts.length,
       onRefresh: () => void fetchAndRender(),
       onSettings: () => navigate('settings'),
     });
+
+    const refreshFooter = (): void => {
+      if (prompts.length > 0) {
+        renderFooter(footerContainer, {
+          prompts,
+          platform,
+          selectionMode,
+          selectedIds,
+          onToggleSelectionMode: () => {
+            selectionMode = !selectionMode;
+            if (!selectionMode) selectedIds.clear();
+            void applyFilters();
+            refreshFooter();
+          },
+        });
+      }
+    };
 
     const applyFilters = async (): Promise<void> => {
       let list = prompts;
@@ -101,7 +120,6 @@ export async function renderMainView(
         },
         onToggleFavorites: async (active) => {
           favoritesOnly = active;
-          // Re-read favorites in case the user starred something this session
           favorites = await getFavorites();
           void applyFilters();
         },
@@ -126,8 +144,6 @@ export async function renderMainView(
           });
           return;
         }
-        // On a known platform with an open conversation but zero prompts,
-        // offer a quick-link to report broken selectors.
         const isKnown = platform !== 'unknown';
         renderEmptyState(body, {
           reason: 'no-prompts',
@@ -142,14 +158,18 @@ export async function renderMainView(
           window.close();
         },
         highlight: query,
+        selectionMode,
+        selectedIds,
+        onSelect: (id, sel) => {
+          if (sel) selectedIds.add(id);
+          else selectedIds.delete(id);
+          refreshFooter();
+        },
       });
     };
 
     await applyFilters();
-
-    if (prompts.length > 0) {
-      renderFooter(footerContainer, { prompts, platform });
-    }
+    refreshFooter();
   };
 
   await fetchAndRender();

@@ -11,17 +11,39 @@ export interface PromptItemOptions {
   onFavorite: (text: string) => Promise<boolean>;
   isFavorite: boolean;
   highlight?: string;
+  selectionMode?: boolean;
+  selected?: boolean;
+  onSelect?: (id: string, selected: boolean) => void;
 }
 
 /** Creates and returns a list-item element for one prompt. */
 export function createPromptItem(opts: PromptItemOptions): HTMLLIElement {
-  const { prompt, onNavigate, onFavorite, isFavorite, highlight } = opts;
+  const {
+    prompt, onNavigate, onFavorite, isFavorite, highlight,
+    selectionMode = false, selected = false, onSelect,
+  } = opts;
   const displayText = truncate(prompt.text, MAX_DISPLAY_CHARS);
 
   const li = document.createElement('li');
   li.className = 'prompt-item';
   li.setAttribute('data-prompt-id', prompt.id);
   li.setAttribute('title', prompt.text);
+  if (selectionMode) li.classList.add('prompt-item--select-mode');
+  if (selected) li.classList.add('prompt-item--selected');
+
+  // Checkbox (shown only in selection mode)
+  if (selectionMode) {
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.className = 'prompt-item__checkbox';
+    cb.checked = selected;
+    cb.setAttribute('aria-label', `Select prompt ${prompt.index + 1}`);
+    cb.addEventListener('change', () => {
+      li.classList.toggle('prompt-item--selected', cb.checked);
+      onSelect?.(prompt.id, cb.checked);
+    });
+    li.appendChild(cb);
+  }
 
   // Index badge
   const indexSpan = document.createElement('span');
@@ -29,13 +51,15 @@ export function createPromptItem(opts: PromptItemOptions): HTMLLIElement {
   indexSpan.setAttribute('aria-label', `Prompt ${prompt.index + 1}`);
   indexSpan.textContent = String(prompt.index + 1);
 
-  // Text (clickable)
+  // Text (clickable only when not in selection mode)
   const textSpan = document.createElement('span');
   textSpan.className = 'prompt-item__text';
   textSpan.innerHTML = highlight
     ? highlightMatch(escapeHtml(displayText), escapeHtml(highlight))
     : escapeHtml(displayText);
-  textSpan.addEventListener('click', () => onNavigate(prompt.id));
+  if (!selectionMode) {
+    textSpan.addEventListener('click', () => onNavigate(prompt.id));
+  }
 
   // Actions wrapper
   const actionsDiv = document.createElement('div');
@@ -72,7 +96,16 @@ export function createPromptItem(opts: PromptItemOptions): HTMLLIElement {
   li.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      onNavigate(prompt.id);
+      if (selectionMode) {
+        const cb = li.querySelector<HTMLInputElement>('.prompt-item__checkbox');
+        if (cb) {
+          cb.checked = !cb.checked;
+          li.classList.toggle('prompt-item--selected', cb.checked);
+          onSelect?.(prompt.id, cb.checked);
+        }
+      } else {
+        onNavigate(prompt.id);
+      }
     }
   });
 
