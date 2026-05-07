@@ -9,6 +9,7 @@
     "dev": "vite",
     "build": "vite build",
     "build:firefox": "node --import tsx scripts/build-firefox.ts",
+    "build:safari": "node --import tsx scripts/build-safari.ts",
     "package": "node --import tsx scripts/package-zip.ts",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
