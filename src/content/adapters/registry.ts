@@ -5,10 +5,9 @@
 
 import type { PromptAdapter } from './base';
 import { ChatGptAdapter } from './chatgpt';
+import { ClaudeAdapter } from './claude';
 
-// Phase 2: ChatGPT only.
-// Phase 4 will add ClaudeAdapter, Phase 5 GeminiAdapter, etc.
-const ADAPTERS: PromptAdapter[] = [new ChatGptAdapter()];
+const ADAPTERS: PromptAdapter[] = [new ChatGptAdapter(), new ClaudeAdapter()];
 
 /**
  * Return the adapter for the given URL, or `null` if no adapter recognizes
