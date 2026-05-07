@@ -1,19 +1,18 @@
-// Theme bootstrap for the popup.
+// Theme management for the popup.
 //
-// Phase 1 just reflects the stored preference (or "auto") onto
-// `<html data-theme>`. Phase 7 expands this into a full theme system
-// with a togglable UI control.
+// Three modes: 'auto' (follows OS), 'light', 'dark'. The current preference
+// is persisted in localStorage so it survives popup close/reopen. The <html>
+// data-theme attribute is the CSS hook (see styles/theme.css).
 
 import { logger } from '@/shared/logger';
 
 export type ThemePreference = 'auto' | 'light' | 'dark';
 
-const THEME_KEY = 'pn:theme';
+const STORAGE_KEY = 'pn:theme';
 
-/** Read stored preference, defaulting to "auto". */
 export function getStoredTheme(): ThemePreference {
   try {
-    const v = localStorage.getItem(THEME_KEY);
+    const v = localStorage.getItem(STORAGE_KEY);
     if (v === 'light' || v === 'dark' || v === 'auto') return v;
   } catch (err) {
     logger.warn('theme: localStorage read failed', err);
@@ -21,7 +20,31 @@ export function getStoredTheme(): ThemePreference {
   return 'auto';
 }
 
-/** Apply the stored theme to the popup's `<html>` element. */
+export function setStoredTheme(theme: ThemePreference): void {
+  try {
+    localStorage.setItem(STORAGE_KEY, theme);
+  } catch (err) {
+    logger.warn('theme: localStorage write failed', err);
+  }
+}
+
+export function applyTheme(theme: ThemePreference): void {
+  document.documentElement.setAttribute('data-theme', theme);
+}
+
 export function applyStoredTheme(): void {
-  document.documentElement.setAttribute('data-theme', getStoredTheme());
+  applyTheme(getStoredTheme());
+}
+
+/** Cycle: auto → dark → light → auto */
+export function cycleTheme(): ThemePreference {
+  const current = getStoredTheme();
+  const next: ThemePreference = current === 'auto' ? 'dark' : current === 'dark' ? 'light' : 'auto';
+  setStoredTheme(next);
+  applyTheme(next);
+  return next;
+}
+
+export function themeLabel(theme: ThemePreference): string {
+  return theme === 'auto' ? '🌗' : theme === 'dark' ? '🌙' : '☀️';
 }

@@ -1,8 +1,11 @@
-// Header component. Brand row + prompt count + refresh button.
+// Header component. Brand row + prompt count + theme toggle + refresh + settings.
+
+import { cycleTheme, getStoredTheme, themeLabel } from '../theme';
 
 export interface HeaderOptions {
   count?: number;
   onRefresh?: () => void;
+  onSettings?: () => void;
 }
 
 /** Renders the header bar inside `container` and returns it for later updates. */
@@ -28,8 +31,19 @@ export function renderHeader(container: HTMLElement, opts: HeaderOptions = {}): 
   if (opts.count !== undefined) {
     countEl.textContent = formatCount(opts.count, opts.count);
   }
-
   actions.appendChild(countEl);
+
+  // Theme toggle
+  const themeBtn = document.createElement('button');
+  themeBtn.className = 'app__btn app__btn--icon';
+  themeBtn.setAttribute('title', 'Toggle theme');
+  themeBtn.setAttribute('aria-label', 'Toggle theme');
+  themeBtn.textContent = themeLabel(getStoredTheme());
+  themeBtn.addEventListener('click', () => {
+    const next = cycleTheme();
+    themeBtn.textContent = themeLabel(next);
+  });
+  actions.appendChild(themeBtn);
 
   if (opts.onRefresh) {
     const refreshBtn = document.createElement('button');
@@ -39,6 +53,16 @@ export function renderHeader(container: HTMLElement, opts: HeaderOptions = {}): 
     refreshBtn.textContent = '🔄';
     refreshBtn.addEventListener('click', opts.onRefresh);
     actions.appendChild(refreshBtn);
+  }
+
+  if (opts.onSettings) {
+    const settingsBtn = document.createElement('button');
+    settingsBtn.className = 'app__btn app__btn--icon';
+    settingsBtn.setAttribute('aria-label', 'Settings');
+    settingsBtn.setAttribute('title', 'Settings');
+    settingsBtn.textContent = '⚙️';
+    settingsBtn.addEventListener('click', opts.onSettings);
+    actions.appendChild(settingsBtn);
   }
 
   header.appendChild(brand);
