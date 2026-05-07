@@ -108,10 +108,49 @@ body {
 }
 
 .prompt-item__text {
+  flex: 1;
   font-size: var(--pn-font-sm);
   color: var(--pn-text);
   line-height: 1.5;
   word-break: break-word;
+  cursor: pointer;
+}
+
+.prompt-item__actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity var(--pn-transition);
+}
+
+.prompt-item:hover .prompt-item__actions,
+.prompt-item:focus-within .prompt-item__actions {
+  opacity: 1;
+}
+
+.prompt-item__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--pn-radius-sm);
+  font-size: 13px;
+  transition: background var(--pn-transition);
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+
+.prompt-item__btn:hover {
+  background: var(--pn-surface-2);
+}
+
+.prompt-item__btn--active {
+  opacity: 1;
 }
 
 /* ── Header actions ──────────────────────────────────────────────────────── */

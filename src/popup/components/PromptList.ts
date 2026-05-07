@@ -3,6 +3,7 @@
 import type { Prompt } from '@/shared/types';
 import { createPromptItem } from './PromptItem';
 import { renderEmptyState } from './EmptyState';
+import { getFavorites, toggleFavorite } from '@/shared/storage';
 
 export interface PromptListOptions {
   prompts: Prompt[];
@@ -11,7 +12,10 @@ export interface PromptListOptions {
 }
 
 /** Renders (or re-renders) the prompt list into `container`. */
-export function renderPromptList(container: HTMLElement, opts: PromptListOptions): void {
+export async function renderPromptList(
+  container: HTMLElement,
+  opts: PromptListOptions,
+): Promise<void> {
   const { prompts, onNavigate, highlight } = opts;
   container.innerHTML = '';
 
@@ -20,12 +24,22 @@ export function renderPromptList(container: HTMLElement, opts: PromptListOptions
     return;
   }
 
+  const favorites = await getFavorites();
+
   const ul = document.createElement('ul');
   ul.className = 'prompt-list';
   ul.setAttribute('aria-label', 'User prompts');
 
   for (const prompt of prompts) {
-    ul.appendChild(createPromptItem({ prompt, onNavigate, highlight }));
+    ul.appendChild(
+      createPromptItem({
+        prompt,
+        onNavigate,
+        highlight,
+        isFavorite: favorites.has(prompt.text),
+        onFavorite: toggleFavorite,
+      }),
+    );
   }
 
   container.appendChild(ul);

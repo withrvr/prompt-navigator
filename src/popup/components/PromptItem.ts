@@ -3,17 +3,19 @@
 import type { Prompt } from '@/shared/types';
 
 const MAX_DISPLAY_CHARS = 120;
+const COPY_FEEDBACK_MS = 1200;
 
 export interface PromptItemOptions {
   prompt: Prompt;
   onNavigate: (id: string) => void;
-  /** Highlight this substring (case-insensitive) in the text. */
+  onFavorite: (text: string) => Promise<boolean>;
+  isFavorite: boolean;
   highlight?: string;
 }
 
 /** Creates and returns a list-item element for one prompt. */
 export function createPromptItem(opts: PromptItemOptions): HTMLLIElement {
-  const { prompt, onNavigate, highlight } = opts;
+  const { prompt, onNavigate, onFavorite, isFavorite, highlight } = opts;
   const displayText = truncate(prompt.text, MAX_DISPLAY_CHARS);
 
   const li = document.createElement('li');
@@ -21,21 +23,52 @@ export function createPromptItem(opts: PromptItemOptions): HTMLLIElement {
   li.setAttribute('data-prompt-id', prompt.id);
   li.setAttribute('title', prompt.text);
 
+  // Index badge
   const indexSpan = document.createElement('span');
   indexSpan.className = 'prompt-item__index';
   indexSpan.setAttribute('aria-label', `Prompt ${prompt.index + 1}`);
   indexSpan.textContent = String(prompt.index + 1);
 
+  // Text (clickable)
   const textSpan = document.createElement('span');
   textSpan.className = 'prompt-item__text';
   textSpan.innerHTML = highlight
     ? highlightMatch(escapeHtml(displayText), escapeHtml(highlight))
     : escapeHtml(displayText);
+  textSpan.addEventListener('click', () => onNavigate(prompt.id));
+
+  // Actions wrapper
+  const actionsDiv = document.createElement('div');
+  actionsDiv.className = 'prompt-item__actions';
+
+  // Copy button
+  const copyBtn = buildIconBtn('📋', 'Copy prompt');
+  copyBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    void navigator.clipboard.writeText(prompt.text).then(() => {
+      copyBtn.textContent = '✅';
+      setTimeout(() => (copyBtn.textContent = '📋'), COPY_FEEDBACK_MS);
+    });
+  });
+
+  // Favorite button
+  const favBtn = buildIconBtn(isFavorite ? '⭐' : '☆', 'Toggle favorite');
+  favBtn.classList.toggle('prompt-item__btn--active', isFavorite);
+  favBtn.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    const nowFav = await onFavorite(prompt.text);
+    favBtn.textContent = nowFav ? '⭐' : '☆';
+    favBtn.classList.toggle('prompt-item__btn--active', nowFav);
+  });
+
+  actionsDiv.appendChild(copyBtn);
+  actionsDiv.appendChild(favBtn);
 
   li.appendChild(indexSpan);
   li.appendChild(textSpan);
+  li.appendChild(actionsDiv);
 
-  li.addEventListener('click', () => onNavigate(prompt.id));
+  li.setAttribute('tabindex', '0');
   li.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
@@ -43,13 +76,18 @@ export function createPromptItem(opts: PromptItemOptions): HTMLLIElement {
     }
   });
 
-  li.setAttribute('role', 'button');
-  li.setAttribute('tabindex', '0');
-
   return li;
 }
 
-/** Wrap matched substring in a <mark> for visual highlight. */
+function buildIconBtn(icon: string, label: string): HTMLButtonElement {
+  const btn = document.createElement('button');
+  btn.className = 'prompt-item__btn';
+  btn.setAttribute('aria-label', label);
+  btn.setAttribute('title', label);
+  btn.textContent = icon;
+  return btn;
+}
+
 function highlightMatch(escapedText: string, escapedQuery: string): string {
   if (!escapedQuery) return escapedText;
   const re = new RegExp(`(${escapeRegex(escapedQuery)})`, 'gi');

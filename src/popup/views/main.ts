@@ -89,7 +89,7 @@ export async function renderMainView(root: HTMLElement): Promise<void> {
     }
 
     const renderList = (list: Prompt[], query: string): void => {
-      renderPromptList(body, {
+      void renderPromptList(body, {
         prompts: list,
         onNavigate: async (promptId) => {
           await sendToContent(tabId, { type: 'SCROLL_TO', promptId });
