@@ -469,3 +469,8 @@ body {
   max-width: 260px;
   line-height: 1.55;
 }
+
+.empty-state__report {
+  margin-top: var(--pn-space-2);
+  font-size: var(--pn-font-xs);
+}

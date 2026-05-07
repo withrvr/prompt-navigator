@@ -8,7 +8,7 @@ import type { Message } from '@/shared/messages';
 import type { Prompt, PromptsResponse } from '@/shared/types';
 import { renderHeader, updateHeaderCount } from '../components/Header';
 import { renderPromptList } from '../components/PromptList';
-import { renderEmptyState } from '../components/EmptyState';
+import { renderEmptyState, buildReportUrl } from '../components/EmptyState';
 import { createSearchBar, filterPrompts, filterFavorites } from '../components/SearchBar';
 import { renderFooter } from '../components/Footer';
 import { getFavorites } from '@/shared/storage';
@@ -70,7 +70,7 @@ export async function renderMainView(
       return;
     }
 
-    const { prompts, platform } = response;
+    const { prompts, platform, url: pageUrl } = response;
     logger.debug('popup: got', prompts.length, 'prompts from', platform);
 
     // Local view state
@@ -126,6 +126,14 @@ export async function renderMainView(
           });
           return;
         }
+        // On a known platform with an open conversation but zero prompts,
+        // offer a quick-link to report broken selectors.
+        const isKnown = platform !== 'unknown';
+        renderEmptyState(body, {
+          reason: 'no-prompts',
+          reportUrl: isKnown ? buildReportUrl(platform, pageUrl) : undefined,
+        });
+        return;
       }
       await renderPromptList(body, {
         prompts: list,
