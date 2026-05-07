@@ -6,6 +6,12 @@ const SUPPORTED = [
   { icon: '🤖', name: 'ChatGPT', url: 'chatgpt.com' },
   { icon: '🧠', name: 'Claude', url: 'claude.ai' },
   { icon: '💎', name: 'Gemini', url: 'gemini.google.com' },
+  { icon: '🔍', name: 'Perplexity', url: 'perplexity.ai' },
+  { icon: '🦾', name: 'Grok', url: 'grok.com' },
+  { icon: '🐳', name: 'DeepSeek', url: 'chat.deepseek.com' },
+  { icon: '🌬️', name: 'Mistral', url: 'chat.mistral.ai' },
+  { icon: '🌙', name: 'Kimi', url: 'kimi.com' },
+  { icon: '🪶', name: 'Meta AI', url: 'meta.ai' },
 ];
 
 export function renderInfoView(root: HTMLElement, onBack: () => void): void {

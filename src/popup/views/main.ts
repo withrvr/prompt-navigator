@@ -1,5 +1,6 @@
 // Main popup view. Fetches user prompts from the active tab, then provides
-// live search, a prompt count, refresh, and access to settings/info views.
+// live search, a prompt count, refresh, favorites-only toggle, and access
+// to settings/info views.
 
 import browser from '@/shared/browser';
 import { logger } from '@/shared/logger';
@@ -8,8 +9,9 @@ import type { Prompt, PromptsResponse } from '@/shared/types';
 import { renderHeader, updateHeaderCount } from '../components/Header';
 import { renderPromptList } from '../components/PromptList';
 import { renderEmptyState } from '../components/EmptyState';
-import { createSearchBar, filterPrompts } from '../components/SearchBar';
+import { createSearchBar, filterPrompts, filterFavorites } from '../components/SearchBar';
 import { renderFooter } from '../components/Footer';
+import { getFavorites } from '@/shared/storage';
 import type { ViewName } from '../popup';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -71,7 +73,10 @@ export async function renderMainView(
     const { prompts, platform } = response;
     logger.debug('popup: got', prompts.length, 'prompts from', platform);
 
+    // Local view state
     let currentQuery = '';
+    let favoritesOnly = false;
+    let favorites = await getFavorites();
 
     const header = renderHeader(headerContainer, {
       count: prompts.length,
@@ -79,23 +84,48 @@ export async function renderMainView(
       onSettings: () => navigate('settings'),
     });
 
+    const applyFilters = async (): Promise<void> => {
+      let list = prompts;
+      if (favoritesOnly) list = filterFavorites(list, favorites);
+      list = filterPrompts(list, currentQuery);
+      await renderList(list, currentQuery, favoritesOnly);
+      updateHeaderCount(header, list.length, prompts.length);
+    };
+
     searchContainer.innerHTML = '';
     if (prompts.length > 0) {
       const bar = createSearchBar({
         onSearch: (q) => {
           currentQuery = q;
-          const filtered = filterPrompts(prompts, q);
-          void renderList(filtered, q);
-          updateHeaderCount(header, filtered.length, prompts.length);
+          void applyFilters();
+        },
+        onToggleFavorites: async (active) => {
+          favoritesOnly = active;
+          // Re-read favorites in case the user starred something this session
+          favorites = await getFavorites();
+          void applyFilters();
         },
       });
       searchContainer.appendChild(bar);
     }
 
-    const renderList = async (list: Prompt[], query: string): Promise<void> => {
-      if (list.length === 0 && query.trim()) {
-        renderEmptyState(body, { reason: 'no-match' });
-        return;
+    const renderList = async (
+      list: Prompt[],
+      query: string,
+      favsOnly: boolean,
+    ): Promise<void> => {
+      if (list.length === 0) {
+        if (query.trim()) {
+          renderEmptyState(body, { reason: 'no-match' });
+          return;
+        }
+        if (favsOnly) {
+          renderEmptyState(body, {
+            reason: 'no-match',
+            detail: 'No starred prompts yet. Tap ⭐ on a prompt to favorite it.',
+          });
+          return;
+        }
       }
       await renderPromptList(body, {
         prompts: list,
@@ -107,8 +137,7 @@ export async function renderMainView(
       });
     };
 
-    await renderList(prompts, currentQuery);
-    updateHeaderCount(header, prompts.length, prompts.length);
+    await applyFilters();
 
     if (prompts.length > 0) {
       renderFooter(footerContainer, { prompts, platform });
