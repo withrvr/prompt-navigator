@@ -355,6 +355,21 @@ body {
   font-size: var(--pn-font-sm);
 }
 
+.settings-manage-btn {
+  font-size: var(--pn-font-sm);
+  color: var(--pn-accent-soft);
+  padding: var(--pn-space-1) 0;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+}
+
+.settings-manage-btn:hover {
+  text-decoration: underline;
+  background: transparent;
+}
+
 /* Info view */
 .info-brand {
   flex-direction: row !important;
@@ -500,6 +515,65 @@ body {
 
 .export-menu__item:hover {
   background: var(--pn-surface-2);
+}
+
+/* ── Favorites management view ───────────────────────────────────────────── */
+
+.fav-hint {
+  font-size: var(--pn-font-xs);
+  color: var(--pn-text-muted);
+  padding: var(--pn-space-2) var(--pn-space-4);
+  padding-bottom: 0;
+}
+
+.fav-list {
+  padding: var(--pn-space-2) 0;
+}
+
+.fav-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--pn-space-2);
+  padding: var(--pn-space-2) var(--pn-space-4);
+  transition: background var(--pn-transition);
+}
+
+.fav-item--over {
+  background: var(--pn-surface-2);
+  outline: 2px solid var(--pn-accent);
+  outline-offset: -2px;
+}
+
+.fav-item--dragging {
+  opacity: 0.4;
+}
+
+.fav-item__handle {
+  flex-shrink: 0;
+  cursor: grab;
+  font-size: 18px;
+  color: var(--pn-text-muted);
+  line-height: 1.5;
+  user-select: none;
+}
+
+.fav-item__handle:active {
+  cursor: grabbing;
+}
+
+.fav-item__text {
+  flex: 1;
+  font-size: var(--pn-font-sm);
+  color: var(--pn-text);
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.fav-item__actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
 }
 
 /* ── Empty state ─────────────────────────────────────────────────────────── */

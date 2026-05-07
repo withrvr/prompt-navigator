@@ -10,6 +10,31 @@ import { logger } from './logger';
 const FAVORITES_KEY = 'pn:favorites';
 const SETTINGS_KEY = 'pn:settings';
 
+// ── Favorites ──────────────────────────────────────────────────────────────
+// Stored as an ordered string[] so the user can reorder their favorites list.
+// All callers that only need membership testing get a Set<string> wrapper.
+
+/** Returns favorites in their saved order as an array. */
+export async function getFavoritesOrdered(): Promise<string[]> {
+  try {
+    const result = await browser.storage.local.get(FAVORITES_KEY);
+    const raw = result[FAVORITES_KEY];
+    if (Array.isArray(raw)) return raw as string[];
+  } catch (err) {
+    logger.warn('storage: getFavoritesOrdered failed', err);
+  }
+  return [];
+}
+
+/** Persists a fully reordered favorites array. */
+export async function saveFavoritesOrdered(ordered: string[]): Promise<void> {
+  try {
+    await browser.storage.local.set({ [FAVORITES_KEY]: ordered });
+  } catch (err) {
+    logger.warn('storage: saveFavoritesOrdered failed', err);
+  }
+}
+
 // ── App Settings ───────────────────────────────────────────────────────────
 
 export interface PnSettings {
@@ -41,36 +66,19 @@ export async function saveSettings(patch: Partial<PnSettings>): Promise<void> {
   }
 }
 
-// ── Favorites ──────────────────────────────────────────────────────────────
-// Favorites are stored as a Set of prompt texts (not IDs, which are
-// positional and change when the conversation grows). Matching is exact.
-
+/** Returns favorites as a Set for O(1) membership testing. */
 export async function getFavorites(): Promise<Set<string>> {
-  try {
-    const result = await browser.storage.local.get(FAVORITES_KEY);
-    const raw = result[FAVORITES_KEY];
-    if (Array.isArray(raw)) return new Set<string>(raw as string[]);
-  } catch (err) {
-    logger.warn('storage: getFavorites failed', err);
-  }
-  return new Set();
-}
-
-export async function saveFavorites(favs: Set<string>): Promise<void> {
-  try {
-    await browser.storage.local.set({ [FAVORITES_KEY]: [...favs] });
-  } catch (err) {
-    logger.warn('storage: saveFavorites failed', err);
-  }
+  return new Set(await getFavoritesOrdered());
 }
 
 export async function toggleFavorite(text: string): Promise<boolean> {
-  const favs = await getFavorites();
-  if (favs.has(text)) {
-    favs.delete(text);
+  const ordered = await getFavoritesOrdered();
+  const idx = ordered.indexOf(text);
+  if (idx !== -1) {
+    ordered.splice(idx, 1);
   } else {
-    favs.add(text);
+    ordered.push(text);
   }
-  await saveFavorites(favs);
-  return favs.has(text);
+  await saveFavoritesOrdered(ordered);
+  return idx === -1; // true = now a favorite
 }

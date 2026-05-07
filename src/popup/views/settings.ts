@@ -1,13 +1,22 @@
-// Settings view. Covers: theme preference, floating button, support link.
+// Settings view. Covers: theme preference, floating button, manage favorites, support.
 
 import { getStoredTheme, setStoredTheme, applyTheme, themeLabel, type ThemePreference } from '../theme';
 import { getSettings, saveSettings } from '@/shared/storage';
+import type { ViewName } from '../popup';
 
-export function renderSettingsView(root: HTMLElement, onBack: () => void): void {
-  void renderSettingsAsync(root, onBack);
+export function renderSettingsView(
+  root: HTMLElement,
+  onBack: () => void,
+  navigate?: (view: ViewName) => void,
+): void {
+  void renderSettingsAsync(root, onBack, navigate);
 }
 
-async function renderSettingsAsync(root: HTMLElement, onBack: () => void): Promise<void> {
+async function renderSettingsAsync(
+  root: HTMLElement,
+  onBack: () => void,
+  navigate?: (view: ViewName) => void,
+): Promise<void> {
   const settings = await getSettings();
   root.innerHTML = '';
 
@@ -87,8 +96,19 @@ async function renderSettingsAsync(root: HTMLElement, onBack: () => void): Promi
     </p>
   `;
 
+  // ── Favorites ──────────────────────────────────────────────────────────
+  const favsSection = document.createElement('div');
+  favsSection.className = 'settings-section';
+  favsSection.innerHTML = `<h2 class="settings-section__title">Favorites</h2>`;
+  const favsLink = document.createElement('button');
+  favsLink.className = 'app__btn settings-manage-btn';
+  favsLink.textContent = '⭐ Manage favorites & reorder';
+  favsLink.addEventListener('click', () => navigate?.('favorites'));
+  favsSection.appendChild(favsLink);
+
   body.appendChild(themeSection);
   body.appendChild(floatSection);
+  body.appendChild(favsSection);
   body.appendChild(supportSection);
   root.appendChild(header);
   root.appendChild(body);
