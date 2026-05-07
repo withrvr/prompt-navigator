@@ -12,6 +12,7 @@ import { GrokAdapter } from './grok';
 import { DeepSeekAdapter } from './deepseek';
 import { MistralAdapter } from './mistral';
 import { KimiAdapter } from './kimi';
+import { MetaAdapter } from './meta';
 
 const ADAPTERS: PromptAdapter[] = [
   new ChatGptAdapter(),
@@ -22,6 +23,7 @@ const ADAPTERS: PromptAdapter[] = [
   DeepSeekAdapter,
   MistralAdapter,
   KimiAdapter,
+  MetaAdapter,
 ];
 
 /**

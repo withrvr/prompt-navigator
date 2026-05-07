@@ -25,6 +25,8 @@ const SUPPORTED_HOSTS = [
   'https://kimi.com/*',
   'https://www.kimi.com/*',
   'https://kimi.moonshot.cn/*',
+  'https://meta.ai/*',
+  'https://www.meta.ai/*',
 ];
 
 export default defineManifest({
