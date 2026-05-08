@@ -1,25 +1,33 @@
-/* Popup layout + components. Fixed dimensions — every view fills the window. */
+/* Popup layout + components. */
 
-html {
-  width: var(--pn-popup-width);
-  height: var(--pn-popup-max-height);
-}
-
+html,
 body {
   width: var(--pn-popup-width);
-  height: var(--pn-popup-max-height); /* forces the popup window to this height */
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
   background: var(--pn-bg);
   color: var(--pn-text);
-  overflow: hidden;
 }
 
 /* ── Root layout ─────────────────────────────────────────────────────────── */
 
+/* Default (settings / info): auto height — popup window shrinks to content. */
 .app {
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100%; /* fills the body exactly */
+  min-height: var(--pn-popup-min-height);
+}
+
+/* List views (main / favorites): hard pixel height so the popup window expands
+   to a fixed size and the inner list scrolls. Never use 100vh — in an extension
+   popup 100vh equals the current (tiny) window, causing near-zero collapse. */
+body.pn-list-view {
+  height: var(--pn-popup-height);
+}
+body.pn-list-view .app {
+  height: var(--pn-popup-height);
 }
 
 /* ── Header ──────────────────────────────────────────────────────────────── */

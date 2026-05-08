@@ -15,6 +15,7 @@ let root: HTMLElement;
 
 export function navigate(view: ViewName): void {
   root.innerHTML = '';
+  document.body.classList.toggle('pn-list-view', view === 'main' || view === 'favorites');
   switch (view) {
     case 'main':
       void renderMainView(root, navigate);
