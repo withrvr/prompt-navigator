@@ -1,0 +1,22 @@
+name: "💬 Other / Question"
+description: "Documentation, questions, or anything that doesn't fit bug or feature."
+labels: ["question"]
+body:
+  - type: input
+    id: extension_version
+    attributes:
+      label: "Extension version (if relevant)"
+      placeholder: "e.g. 1.3.0"
+
+  - type: textarea
+    id: description
+    attributes:
+      label: "What's on your mind?"
+      description: "Ask a question, report a documentation issue, or leave general feedback."
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: "Additional context"

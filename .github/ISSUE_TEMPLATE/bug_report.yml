@@ -1,0 +1,99 @@
+name: "🐛 Bug Report"
+description: "Something is broken or not working as expected."
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! The more detail you provide, the faster we can fix it.
+
+  - type: input
+    id: extension_version
+    attributes:
+      label: "Extension version"
+      description: "Find this in chrome://extensions or the extension's info page."
+      placeholder: "e.g. 1.3.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: browser
+    attributes:
+      label: "Browser"
+      options:
+        - "Chrome"
+        - "Firefox"
+        - "Edge"
+        - "Safari"
+        - "Other (describe below)"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: "AI platform / site"
+      description: "Which site are you on when the bug occurs?"
+      multiple: true
+      options:
+        - "ChatGPT (chatgpt.com)"
+        - "Claude (claude.ai)"
+        - "Gemini (gemini.google.com)"
+        - "Perplexity (perplexity.ai)"
+        - "Grok (grok.com)"
+        - "Grok on X (x.com/i/grok)"
+        - "DeepSeek (chat.deepseek.com)"
+        - "Mistral / Le Chat (chat.mistral.ai)"
+        - "Kimi (kimi.com)"
+        - "Meta AI (meta.ai)"
+        - "Other / not listed"
+    validations:
+      required: true
+
+  - type: input
+    id: page_url
+    attributes:
+      label: "Page URL (sanitised if needed)"
+      description: "Paste the URL of the page where the bug occurs. Remove any sensitive parts."
+      placeholder: "https://chatgpt.com/c/..."
+
+  - type: textarea
+    id: description
+    attributes:
+      label: "What happened?"
+      description: "A clear description of the bug."
+      placeholder: "When I click the extension icon on a DeepSeek conversation, it shows 'No messages yet' even though there are messages."
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: "Steps to reproduce"
+      placeholder: |
+        1. Open a conversation on [site]
+        2. Click the Prompt Navigator icon
+        3. See error / wrong state
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: "Expected behaviour"
+      placeholder: "The prompt list should appear with all my prompts."
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: "Screenshots / screen recording"
+      description: "Drag & drop screenshots here if helpful."
+
+  - type: textarea
+    id: console_errors
+    attributes:
+      label: "Console errors (optional)"
+      description: "Open DevTools → Console on the AI page and paste any red errors here."
+      render: "text"

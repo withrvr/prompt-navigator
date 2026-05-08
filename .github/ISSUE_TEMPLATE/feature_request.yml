@@ -1,0 +1,65 @@
+name: "✨ Feature Request"
+description: "Suggest a new feature or enhancement."
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have an idea to make Prompt Navigator better? We'd love to hear it!
+
+  - type: input
+    id: extension_version
+    attributes:
+      label: "Extension version"
+      placeholder: "e.g. 1.3.0"
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: "What problem does this solve?"
+      description: "Describe the pain point or use-case this feature addresses."
+      placeholder: "When I export prompts to CSV, long prompts with newlines create extra rows in Excel..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: "Proposed solution"
+      description: "Describe how you'd like this to work."
+      placeholder: "Escape newlines as \\n inside CSV cells so each prompt stays on one row."
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: "Alternatives considered"
+      description: "Did you consider any other approaches?"
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: "Relevant AI platform(s)"
+      description: "Which site(s) does this feature concern? Leave blank if it's a general feature."
+      multiple: true
+      options:
+        - "ChatGPT (chatgpt.com)"
+        - "Claude (claude.ai)"
+        - "Gemini (gemini.google.com)"
+        - "Perplexity (perplexity.ai)"
+        - "Grok (grok.com / x.com)"
+        - "DeepSeek (chat.deepseek.com)"
+        - "Mistral / Le Chat (chat.mistral.ai)"
+        - "Kimi (kimi.com)"
+        - "Meta AI (meta.ai)"
+        - "All platforms"
+        - "Not platform-specific"
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: "Additional context / screenshots"
+      description: "Anything else that would help us understand the request."
