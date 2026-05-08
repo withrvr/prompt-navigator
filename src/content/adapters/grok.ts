@@ -1,18 +1,18 @@
 // Grok adapter (grok.com, x.com/i/grok).
 //
-// Source confirms `div.message-bubble` is the per-turn container
-// (verified via the give-me/bookmarklets export script). Grok renders both
-// user and assistant turns with the same class, so we filter user turns by
-// alignment: user bubbles live inside a flex row with `items-end` /
-// `justify-end` (right-aligned), assistant bubbles are left-aligned.
+// grok.com: user bubbles are right-aligned via `items-end`/`justify-end`.
+// x.com/i/grok: Grok is embedded inside X's SPA; the same message-bubble
+// structure is used but the conversation ID appears as a query param
+// (?conversation=...) rather than in the path.
 //
 // Selector chain:
-//   1. div.items-end div.message-bubble        — current right-aligned wrapper
-//   2. div.justify-end div.message-bubble      — alternate Tailwind layout
-//   3. div[data-message-author="user"]         — hopeful future-proof attr
-//
-// If the structure changes and none of the above hit, fall back to even-
-// indexed message bubbles (chat conventions: index 0 = user, 1 = assistant).
+//   1. div.items-end div.message-bubble         — right-aligned wrapper (primary)
+//   2. div.justify-end div.message-bubble       — alternate Tailwind layout
+//   3. div[data-message-author="user"]          — semantic author attribute
+//   4. div[data-testid="user-message"]          — test ID (if Grok adds one)
+//   5. [class*="UserMessage"]                   — camel-case React component
+//   6. [class*="user-message"]                  — kebab fallback
+//   7. div.message-bubble (even-indexed)        — fallback: user = even turns
 
 import type { DomPrompt, PromptAdapter } from './base';
 import { observeDom } from '@/content/observer';
@@ -24,6 +24,9 @@ const PRIMARY_SELECTORS = [
   'div.items-end div.message-bubble',
   'div.justify-end div.message-bubble',
   'div[data-message-author="user"]',
+  'div[data-testid="user-message"]',
+  '[class*="UserMessage"]',
+  '[class*="user-message"]',
 ];
 
 const FALLBACK_ALL_BUBBLES = 'div.message-bubble';
@@ -35,7 +38,9 @@ export class GrokAdapter implements PromptAdapter {
 
   matches(url: URL): boolean {
     if (GROK_HOSTS.has(url.hostname)) return true;
-    // Grok also lives at x.com/i/grok and twitter.com/i/grok
+    // Also handle subdomains of grok.com
+    if (url.hostname.endsWith('.grok.com')) return true;
+    // Grok embedded in x.com and twitter.com at /i/grok
     if (url.hostname === 'x.com' || url.hostname === 'twitter.com') {
       return url.pathname.startsWith('/i/grok');
     }
@@ -46,7 +51,7 @@ export class GrokAdapter implements PromptAdapter {
     let nodes = querySelectorFromList(PRIMARY_SELECTORS);
 
     if (nodes.length === 0) {
-      // Fallback: alternate every other message-bubble starting at index 0.
+      // Fallback: even-indexed message bubbles (user turn first in a conversation).
       const all = Array.from(
         document.querySelectorAll<HTMLElement>(FALLBACK_ALL_BUBBLES),
       );

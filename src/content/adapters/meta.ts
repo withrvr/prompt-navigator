@@ -1,15 +1,18 @@
 // Meta AI adapter (meta.ai).
 //
-// Meta AI runs on a React stack with hashed Tailwind class names. We lead
-// with attribute-based selectors (Meta uses data-testid heavily across its
-// products) and fall back to structural / kebab-case patterns.
+// Meta AI is a React/Relay app with heavy test-ID usage. User messages are
+// typically right-aligned bubbles. Extended selector chain for resilience.
 //
 // Selector chain:
-//   1. div[data-testid="user-message"]   — most likely (Meta's standard)
-//   2. div[data-message-author="user"]
-//   3. div[data-author="user"]
-//   4. div.user-message
-//   5. div.x1n2onr6.x1ja2u2z              — Meta's typical hashed bubble class
+//   1. div[data-testid="user-message"]     — Meta's standard test ID
+//   2. div[data-testid="message-bubble-user"] — alternate test ID
+//   3. div[data-message-author="user"]     — semantic author attribute
+//   4. div[data-author="user"]             — alternate author attribute
+//   5. div[data-message-role="user"]       — role attribute
+//   6. div.user-message                    — generic class
+//   7. div[class*="UserMessage"]           — camel-case
+//   8. div[class*="user_message"]          — underscored variant
+//   9. div[class*="outgoing"]              — direction-based (Meta uses this)
 
 import { makeAdapter } from './common';
 
@@ -18,9 +21,13 @@ export const MetaAdapter = makeAdapter({
   hosts: ['meta.ai', 'www.meta.ai'],
   selectors: [
     'div[data-testid="user-message"]',
+    'div[data-testid="message-bubble-user"]',
     'div[data-message-author="user"]',
     'div[data-author="user"]',
+    'div[data-message-role="user"]',
     'div.user-message',
+    'div[class*="UserMessage"]',
     'div[class*="user_message"]',
+    'div[class*="outgoing"]',
   ],
 });

@@ -20,7 +20,7 @@ export class ClaudeAdapter implements PromptAdapter {
   readonly id: PlatformId = 'claude';
 
   matches(url: URL): boolean {
-    return url.hostname === 'claude.ai';
+    return url.hostname === 'claude.ai' || url.hostname.endsWith('.claude.ai');
   }
 
   getPrompts(): DomPrompt[] {

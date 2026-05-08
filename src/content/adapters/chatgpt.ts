@@ -12,13 +12,13 @@ import { extractText } from './extract';
 import type { PlatformId } from '@/shared/types';
 
 const USER_ROLE_SELECTOR = '[data-message-author-role="user"]';
-const CHATGPT_HOSTS = new Set(['chatgpt.com', 'chat.openai.com']);
+const CHATGPT_HOSTS = new Set(['chatgpt.com', 'chat.openai.com', 'www.chatgpt.com']);
 
 export class ChatGptAdapter implements PromptAdapter {
   readonly id: PlatformId = 'chatgpt';
 
   matches(url: URL): boolean {
-    return CHATGPT_HOSTS.has(url.hostname);
+    return CHATGPT_HOSTS.has(url.hostname) || url.hostname.endsWith('.chatgpt.com');
   }
 
   getPrompts(): DomPrompt[] {

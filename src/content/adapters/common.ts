@@ -31,7 +31,12 @@ export function makeAdapter(cfg: CommonAdapterConfig): PromptAdapter {
     id: cfg.id,
 
     matches(url: URL): boolean {
-      if (!cfg.hosts.includes(url.hostname)) return false;
+      const hostname = url.hostname;
+      // Support both exact match and subdomain wildcard (e.g. "perplexity.ai" matches "www.perplexity.ai")
+      const matched = cfg.hosts.some(
+        (h) => hostname === h || hostname.endsWith(`.${h}`),
+      );
+      if (!matched) return false;
       if (cfg.pathMatches && !cfg.pathMatches(url)) return false;
       return true;
     },

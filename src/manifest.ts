@@ -10,23 +10,22 @@ import pkg from '../package.json' with { type: 'json' };
  * Kept narrow — we never request `<all_urls>` to keep the permissions
  * footprint store-friendly. Add a host here when you add an adapter.
  */
+// Wildcard patterns allow any subdomain so the extension keeps working even if
+// a site adds a region prefix or migrates to a new subdomain.
 const SUPPORTED_HOSTS = [
-  'https://chatgpt.com/*',
-  'https://chat.openai.com/*',
-  'https://claude.ai/*',
-  'https://gemini.google.com/*',
-  'https://www.perplexity.ai/*',
-  'https://perplexity.ai/*',
-  'https://grok.com/*',
-  'https://www.grok.com/*',
-  'https://x.com/i/grok*',
-  'https://chat.deepseek.com/*',
-  'https://chat.mistral.ai/*',
-  'https://kimi.com/*',
-  'https://www.kimi.com/*',
-  'https://kimi.moonshot.cn/*',
-  'https://meta.ai/*',
-  'https://www.meta.ai/*',
+  '*://*.chatgpt.com/*',
+  '*://chat.openai.com/*',
+  '*://*.claude.ai/*',
+  '*://gemini.google.com/*',
+  '*://*.perplexity.ai/*',
+  '*://*.grok.com/*',
+  '*://x.com/i/grok*',
+  '*://x.com/i/grok/*',
+  '*://*.deepseek.com/*',
+  '*://*.mistral.ai/*',
+  '*://*.kimi.com/*',
+  '*://kimi.moonshot.cn/*',
+  '*://*.meta.ai/*',
 ];
 
 export default defineManifest({
