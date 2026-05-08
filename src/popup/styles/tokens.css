@@ -5,7 +5,7 @@
   /* Sizing */
   --pn-popup-width: 360px;
   --pn-popup-min-height: 240px;
-  --pn-popup-max-height: 600px;
+  --pn-popup-max-height: min(600px, 100vh);
 
   --pn-radius-sm: 6px;
   --pn-radius-md: 10px;

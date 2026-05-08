@@ -1,29 +1,21 @@
 // In-popup keyboard shortcuts.
 //
 // Always-on:
-//   1-9          Jump to prompt #N directly
+//   1-9          Jump directly to prompt #N
 //   Arrow Down   Focus next prompt item
 //   Arrow Up     Focus previous prompt item
 //
-// When a prompt item has focus:
-//   Enter / Space  Activate (navigate to page)
-//   [copy key]     Copy the prompt text (default: c)
-//   [fav  key]     Toggle favorite (default: f)
-
-import type { PnSettings } from '@/shared/storage';
+// Enter / Space on a focused item activates it (navigate to page).
 
 export interface KeyboardContext {
-  /** Returns the current list of prompt-item elements. */
   getItems: () => NodeListOf<HTMLElement> | HTMLElement[];
-  /** Called when shortcut 1-9 is pressed — navigate to prompt index. */
   onJump: (index: number) => void;
-  shortcuts: PnSettings['shortcuts'];
+  shortcuts: Record<string, string>; // kept for API compat but unused
 }
 
 /** Registers popup keyboard shortcuts and returns a disposer. */
 export function registerKeyboardShortcuts(ctx: KeyboardContext): () => void {
   const handler = (e: KeyboardEvent): void => {
-    // Ignore when user is typing in an input / textarea / search
     const target = e.target as HTMLElement;
     if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
     if (e.ctrlKey || e.metaKey || e.altKey) return;
@@ -55,22 +47,6 @@ export function registerKeyboardShortcuts(ctx: KeyboardContext): () => void {
         e.preventDefault();
         ctx.onJump(idx);
       }
-      return;
-    }
-
-    // ── Per-item shortcuts (require a focused prompt item) ─────────────────
-    if (focusedIdx === -1) return;
-    const item = items[focusedIdx];
-
-    if (key === ctx.shortcuts.copy) {
-      e.preventDefault();
-      item.querySelector<HTMLButtonElement>('[aria-label="Copy prompt"]')?.click();
-      return;
-    }
-    if (key === ctx.shortcuts.favorite) {
-      e.preventDefault();
-      item.querySelector<HTMLButtonElement>('[aria-label="Toggle favorite"]')?.click();
-      return;
     }
   };
 

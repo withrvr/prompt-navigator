@@ -5,7 +5,7 @@
 import browser from '@/shared/browser';
 
 const PANEL_W = 364;
-const PANEL_H = 520;
+const PANEL_H = 580;
 const BTN_SIZE = 44;
 
 let hostEl: HTMLElement | null = null;
@@ -60,6 +60,7 @@ export function injectFloatingButton(): () => void {
       border-radius: 12px;
       box-shadow: 0 8px 40px rgba(0,0,0,.35);
       display: none;
+      overflow: hidden;
     }
     .pn-panel--open { display: block; }
   `;
