@@ -4,8 +4,8 @@
 
 import browser from '@/shared/browser';
 
-const PANEL_W = 364;
-const PANEL_H = 580;
+const PANEL_W = 484;
+const PANEL_H = 684;
 const BTN_SIZE = 44;
 
 let hostEl: HTMLElement | null = null;
