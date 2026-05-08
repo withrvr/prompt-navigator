@@ -11,3 +11,8 @@ coverage/
 .idea/
 .vscode/*
 !.vscode/extensions.json
+
+testing-testing/
+
+CLAUDE.md
+.claude/

@@ -7,7 +7,6 @@ import { exportPdf } from '@/shared/exporters/pdf';
 
 export interface FooterOptions {
   prompts: Prompt[];
-  /** The currently-visible filtered subset — exported when no items are selected. */
   filteredPrompts?: Prompt[];
   platform: string;
   pageUrl?: string;
@@ -17,11 +16,9 @@ export interface FooterOptions {
   onToggleSelectionMode: () => void;
   onSelectAll?: () => void;
   onDeselectAll?: () => void;
-  /** Reference to the scrollable body element for scroll-to-top/bottom. */
   bodyEl?: HTMLElement;
 }
 
-/** Renders the footer bar inside `container`. */
 export function renderFooter(container: HTMLElement, opts: FooterOptions): void {
   const {
     prompts, filteredPrompts, platform, pageUrl, favorites,
@@ -33,7 +30,11 @@ export function renderFooter(container: HTMLElement, opts: FooterOptions): void 
   const footer = document.createElement('footer');
   footer.className = 'app__footer';
 
-  // ── Scroll helpers (top / bottom) ─────────────────────────────────────────
+  // ── LEFT GROUP: scroll ▸ Select/Done ▸ All/None ───────────────────────────
+  const leftGroup = document.createElement('div');
+  leftGroup.className = 'footer__left';
+
+  // Scroll helpers
   const scrollGroup = document.createElement('div');
   scrollGroup.className = 'footer__scroll-group';
 
@@ -56,7 +57,7 @@ export function renderFooter(container: HTMLElement, opts: FooterOptions): void 
   scrollGroup.appendChild(scrollTopBtn);
   scrollGroup.appendChild(scrollBotBtn);
 
-  // ── Select / Done toggle ───────────────────────────────────────────────────
+  // Select / Done — fixed position, never moves
   const selectBtn = document.createElement('button');
   selectBtn.className = `app__btn app__btn--select${selectionMode ? ' app__btn--select-active' : ''}`;
   selectBtn.textContent = selectionMode ? 'Done' : 'Select';
@@ -64,30 +65,35 @@ export function renderFooter(container: HTMLElement, opts: FooterOptions): void 
   selectBtn.setAttribute('title', selectionMode ? 'Exit selection mode' : 'Select prompts to export');
   selectBtn.addEventListener('click', onToggleSelectionMode);
 
-  // ── Select-all / Deselect-all (only in selection mode) ────────────────────
+  // All / None — always in DOM, visibility toggled (no layout shift)
   const selectAllGroup = document.createElement('div');
-  selectAllGroup.className = 'footer__select-all-group';
-  selectAllGroup.hidden = !selectionMode;
+  selectAllGroup.className =
+    'footer__select-all-group' + (selectionMode ? ' footer__select-all-group--visible' : '');
+  selectAllGroup.setAttribute('aria-hidden', String(!selectionMode));
 
-  if (selectionMode) {
-    const allBtn = document.createElement('button');
-    allBtn.className = 'app__btn footer__all-btn';
-    allBtn.textContent = '✓ All';
-    allBtn.title = 'Select all';
-    allBtn.addEventListener('click', () => onSelectAll?.());
+  const allBtn = document.createElement('button');
+  allBtn.className = 'app__btn footer__all-btn';
+  allBtn.textContent = '✓ All';
+  allBtn.title = 'Select all';
+  allBtn.addEventListener('click', () => onSelectAll?.());
 
-    const noneBtn = document.createElement('button');
-    noneBtn.className = 'app__btn footer__all-btn';
-    noneBtn.textContent = '✕ None';
-    noneBtn.title = 'Deselect all';
-    noneBtn.addEventListener('click', () => onDeselectAll?.());
+  const noneBtn = document.createElement('button');
+  noneBtn.className = 'app__btn footer__all-btn';
+  noneBtn.textContent = '✕ None';
+  noneBtn.title = 'Deselect all';
+  noneBtn.addEventListener('click', () => onDeselectAll?.());
 
-    selectAllGroup.appendChild(allBtn);
-    selectAllGroup.appendChild(noneBtn);
-  }
+  selectAllGroup.appendChild(allBtn);
+  selectAllGroup.appendChild(noneBtn);
 
-  // ── Determine which prompts to export ─────────────────────────────────────
-  // Priority: hand-selected > filtered > all
+  leftGroup.appendChild(scrollGroup);
+  leftGroup.appendChild(selectBtn);
+  leftGroup.appendChild(selectAllGroup);
+
+  // ── RIGHT GROUP: Export button + dropdown ─────────────────────────────────
+  const rightGroup = document.createElement('div');
+  rightGroup.className = 'footer__right';
+
   const visible = filteredPrompts ?? prompts;
   const exportList =
     selectionMode && selectedIds.size > 0
@@ -113,7 +119,6 @@ export function renderFooter(container: HTMLElement, opts: FooterOptions): void 
   menu.hidden = true;
   menu.setAttribute('role', 'menu');
 
-  // ── Export menu open/close (self-contained, no global capture leaks) ───────
   let outsideListener: ((e: MouseEvent) => void) | null = null;
 
   const closeMenu = (): void => {
@@ -129,9 +134,8 @@ export function renderFooter(container: HTMLElement, opts: FooterOptions): void 
     menu.hidden = false;
     exportBtn.setAttribute('aria-expanded', 'true');
     outsideListener = (e: MouseEvent) => {
-      if (!footer.contains(e.target as Node)) closeMenu();
+      if (!rightGroup.contains(e.target as Node)) closeMenu();
     };
-    // Defer so the current click doesn't immediately close the menu.
     setTimeout(() => document.addEventListener('click', outsideListener!), 0);
   };
 
@@ -152,17 +156,14 @@ export function renderFooter(container: HTMLElement, opts: FooterOptions): void 
     li.setAttribute('role', 'menuitem');
     li.className = 'export-menu__item';
     li.textContent = fmt.label;
-    li.addEventListener('click', () => {
-      fmt.action();
-      closeMenu();
-    });
+    li.addEventListener('click', () => { fmt.action(); closeMenu(); });
     menu.appendChild(li);
   }
 
-  footer.appendChild(scrollGroup);
-  footer.appendChild(selectBtn);
-  footer.appendChild(selectAllGroup);
-  footer.appendChild(exportBtn);
-  footer.appendChild(menu);
+  rightGroup.appendChild(exportBtn);
+  rightGroup.appendChild(menu);
+
+  footer.appendChild(leftGroup);
+  footer.appendChild(rightGroup);
   container.appendChild(footer);
 }

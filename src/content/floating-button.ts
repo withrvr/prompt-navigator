@@ -4,8 +4,8 @@
 
 import browser from '@/shared/browser';
 
-const PANEL_W = 364;
-const PANEL_H = 580;
+const PANEL_W = 436;  // 1.2× original
+const PANEL_H = 700;  // capped — full 1200 is too tall for in-page overlay
 const BTN_SIZE = 44;
 
 let hostEl: HTMLElement | null = null;

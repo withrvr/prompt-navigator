@@ -1,16 +1,15 @@
-/* Popup layout + components. 360px wide, dense but tap-friendly. */
+/* Popup layout + components. Fixed dimensions — every view fills the window. */
 
-html,
-body {
+html {
   width: var(--pn-popup-width);
-  background: var(--pn-bg);
-  color: var(--pn-text);
-  height: 100%;
+  height: var(--pn-popup-max-height);
 }
 
 body {
-  min-height: var(--pn-popup-min-height);
-  max-height: var(--pn-popup-max-height);
+  width: var(--pn-popup-width);
+  height: var(--pn-popup-max-height); /* forces the popup window to this height */
+  background: var(--pn-bg);
+  color: var(--pn-text);
   overflow: hidden;
 }
 
@@ -20,9 +19,7 @@ body {
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100%;
-  min-height: var(--pn-popup-min-height);
-  max-height: var(--pn-popup-max-height);
+  height: 100%; /* fills the body exactly */
 }
 
 /* ── Header ──────────────────────────────────────────────────────────────── */
@@ -540,11 +537,22 @@ body {
 .app__footer {
   display: flex;
   align-items: center;
-  gap: var(--pn-space-1);
+  justify-content: space-between;
   padding: var(--pn-space-2) var(--pn-space-3);
   border-top: 1px solid var(--pn-border);
   background: var(--pn-surface);
   flex-shrink: 0;
+}
+
+/* Left side: scroll buttons + Select/Done + All/None */
+.footer__left {
+  display: flex;
+  align-items: center;
+  gap: var(--pn-space-2);
+}
+
+/* Right side: export button + dropdown (position:relative for the menu) */
+.footer__right {
   position: relative;
 }
 
@@ -552,7 +560,6 @@ body {
   display: flex;
   align-items: center;
   gap: 2px;
-  margin-right: auto;
 }
 
 .footer__scroll-btn {
@@ -565,10 +572,16 @@ body {
   color: var(--pn-text);
 }
 
+/* All / None — always in the DOM, visibility-toggled so layout never shifts */
 .footer__select-all-group {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
+  visibility: hidden; /* reserved space even when hidden */
+}
+
+.footer__select-all-group--visible {
+  visibility: visible;
 }
 
 .footer__all-btn {
@@ -585,15 +598,20 @@ body {
   border-color: var(--pn-accent);
 }
 
-.app__btn--select {
+/* Select / Done — same size as Export, fixed on the left, never moves */
+.app__btn--select,
+.app__btn--export {
   font-size: var(--pn-font-sm);
   padding: var(--pn-space-1) var(--pn-space-3);
   background: var(--pn-surface-2);
   border: 1px solid var(--pn-border);
   border-radius: var(--pn-radius-sm);
+  transition: background var(--pn-transition), color var(--pn-transition),
+              border-color var(--pn-transition);
+}
+
+.app__btn--select {
   color: var(--pn-text-muted);
-  transition: background var(--pn-transition), color var(--pn-transition);
-  margin-right: auto;
 }
 
 .app__btn--select:hover {
@@ -607,13 +625,7 @@ body {
 }
 
 .app__btn--export {
-  font-size: var(--pn-font-sm);
-  padding: var(--pn-space-1) var(--pn-space-3);
-  background: var(--pn-surface-2);
-  border: 1px solid var(--pn-border);
-  border-radius: var(--pn-radius-sm);
   color: var(--pn-text);
-  transition: background var(--pn-transition);
 }
 
 .app__btn--export:hover {
@@ -624,7 +636,7 @@ body {
 .export-menu {
   position: absolute;
   bottom: calc(100% + 4px);
-  right: var(--pn-space-3);
+  right: 0;
   background: var(--pn-surface);
   border: 1px solid var(--pn-border);
   border-radius: var(--pn-radius-md);

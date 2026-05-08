@@ -3,9 +3,10 @@
 
 :root {
   /* Sizing */
-  --pn-popup-width: 360px;
+  --pn-popup-width: 432px;
+  --pn-popup-height: 1200px;
   --pn-popup-min-height: 240px;
-  --pn-popup-max-height: min(600px, 100vh);
+  --pn-popup-max-height: min(1200px, 100vh);
 
   --pn-radius-sm: 6px;
   --pn-radius-md: 10px;
