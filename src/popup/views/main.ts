@@ -42,6 +42,7 @@ export async function renderMainView(
   const headerContainer = document.createElement('div');
   const searchContainer = document.createElement('div');
   searchContainer.className = 'app__search';
+  searchContainer.hidden = true; // hidden until prompts arrive
   const body = document.createElement('section');
   body.className = 'app__body';
   const footerContainer = document.createElement('div');
@@ -66,7 +67,9 @@ export async function renderMainView(
 
     if (!response) {
       renderHeader(headerContainer, { onSettings: () => navigate('settings') });
+      searchContainer.hidden = true;
       searchContainer.innerHTML = '';
+      footerContainer.innerHTML = '';
       renderEmptyState(body, { reason: 'unsupported' });
       return;
     }
@@ -81,6 +84,7 @@ export async function renderMainView(
     let selectionMode = false;
     const selectedIds = new Set<string>();
     const settings = await getSettings();
+    let currentFiltered: Prompt[] = [...prompts];
 
     const header = renderHeader(headerContainer, {
       count: prompts.length,
@@ -92,12 +96,26 @@ export async function renderMainView(
       if (prompts.length > 0) {
         renderFooter(footerContainer, {
           prompts,
+          filteredPrompts: currentFiltered,
           platform,
+          pageUrl,
+          favorites,
           selectionMode,
           selectedIds,
+          bodyEl: body,
           onToggleSelectionMode: () => {
             selectionMode = !selectionMode;
             if (!selectionMode) selectedIds.clear();
+            void applyFilters();
+            refreshFooter();
+          },
+          onSelectAll: () => {
+            currentFiltered.forEach((p) => selectedIds.add(p.id));
+            void applyFilters();
+            refreshFooter();
+          },
+          onDeselectAll: () => {
+            selectedIds.clear();
             void applyFilters();
             refreshFooter();
           },
@@ -109,12 +127,15 @@ export async function renderMainView(
       let list = prompts;
       if (favoritesOnly) list = filterFavorites(list, favorites);
       list = filterPrompts(list, currentQuery);
+      currentFiltered = list;
       await renderList(list, currentQuery, favoritesOnly);
       updateHeaderCount(header, list.length, prompts.length);
+      refreshFooter();
     };
 
-    searchContainer.innerHTML = '';
     if (prompts.length > 0) {
+      searchContainer.hidden = false;
+      searchContainer.innerHTML = '';
       const bar = createSearchBar({
         onSearch: (q) => {
           currentQuery = q;
@@ -127,6 +148,8 @@ export async function renderMainView(
         },
       });
       searchContainer.appendChild(bar);
+    } else {
+      searchContainer.hidden = true;
     }
 
     const renderList = async (
@@ -153,9 +176,15 @@ export async function renderMainView(
         });
         return;
       }
+      // Restore scroll position from session storage
+      const scrollKey = `pn:scroll:${pageUrl}`;
+      const savedScroll = sessionStorage.getItem(scrollKey);
+
       await renderPromptList(body, {
         prompts: list,
         onNavigate: async (promptId) => {
+          // Save scroll position before navigating away
+          sessionStorage.setItem(scrollKey, String(body.scrollTop));
           await sendToContent(tabId, { type: 'SCROLL_TO', promptId });
           window.close();
         },
@@ -167,11 +196,16 @@ export async function renderMainView(
           else selectedIds.delete(id);
           refreshFooter();
         },
+        favorites,
       });
+
+      // Restore scroll after render
+      if (savedScroll !== null) {
+        body.scrollTop = Number(savedScroll);
+      }
     };
 
     await applyFilters();
-    refreshFooter();
 
     // Register keyboard shortcuts after the first render
     const disposeKeys = registerKeyboardShortcuts({

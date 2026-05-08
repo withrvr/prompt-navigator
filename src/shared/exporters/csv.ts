@@ -1,20 +1,33 @@
-// CSV exporter. Produces RFC 4180-compliant CSV with header row.
+// CSV exporter. RFC 4180-compliant CSV with header row and full meta info.
 
 import type { Prompt } from '../types';
+import type { ExportContext } from './json';
+import { buildFilename } from './json';
 
-export function exportCsv(prompts: Prompt[], filename = 'prompts.csv'): void {
-  const rows = [
-    ['#', 'Prompt'],
-    ...prompts.map((p) => [String(p.index + 1), p.text]),
+export function exportCsv(prompts: Prompt[], ctx: ExportContext = {}, filename?: string): void {
+  const { platform, pageUrl, favorites } = ctx;
+  const rows: string[][] = [
+    ['#', 'Prompt', 'Favorited', 'Platform', 'Source URL'],
+    ...prompts.map((p) => [
+      String(p.index + 1),
+      p.text,
+      favorites ? (favorites.has(p.text) ? 'yes' : 'no') : 'no',
+      platform ?? '',
+      pageUrl ?? '',
+    ]),
   ];
-  const csv = rows.map((row) => row.map(csvCell).join(',')).join('\r\n');
+  // Add BOM so Excel opens UTF-8 correctly
+  const bom = '﻿';
+  const csv = bom + rows.map((row) => row.map(csvCell).join(',')).join('\r\n');
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  download(blob, filename);
+  download(blob, filename ?? buildFilename(platform, pageUrl, 'csv'));
 }
 
-/** Wrap in double quotes and escape internal double quotes per RFC 4180. */
+/** Wrap in double-quotes and escape embedded double-quotes per RFC 4180.
+ *  Newlines are converted to the literal string \n so Excel shows one row per prompt. */
 function csvCell(value: string): string {
-  const escaped = value.replace(/"/g, '""');
+  const normalized = value.replace(/\r?\n|\r/g, '\\n');
+  const escaped = normalized.replace(/"/g, '""');
   return `"${escaped}"`;
 }
 

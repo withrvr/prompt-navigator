@@ -2,7 +2,7 @@
 
 import type { Prompt } from '@/shared/types';
 
-const MAX_DISPLAY_CHARS = 120;
+const MAX_DISPLAY_CHARS = 200;
 const COPY_FEEDBACK_MS = 1200;
 
 export interface PromptItemOptions {
@@ -27,9 +27,9 @@ export function createPromptItem(opts: PromptItemOptions): HTMLLIElement {
   const li = document.createElement('li');
   li.className = 'prompt-item';
   li.setAttribute('data-prompt-id', prompt.id);
-  li.setAttribute('title', prompt.text);
   if (selectionMode) li.classList.add('prompt-item--select-mode');
   if (selected) li.classList.add('prompt-item--selected');
+  if (isFavorite) li.classList.add('prompt-item--favorited');
 
   // Checkbox (shown only in selection mode)
   if (selectionMode) {
@@ -83,6 +83,7 @@ export function createPromptItem(opts: PromptItemOptions): HTMLLIElement {
     const nowFav = await onFavorite(prompt.text);
     favBtn.textContent = nowFav ? '⭐' : '☆';
     favBtn.classList.toggle('prompt-item__btn--active', nowFav);
+    li.classList.toggle('prompt-item--favorited', nowFav);
   });
 
   actionsDiv.appendChild(copyBtn);

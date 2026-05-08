@@ -1,6 +1,5 @@
-// Header component. Brand row + prompt count + theme toggle + refresh + settings.
-
-import { cycleTheme, getStoredTheme, themeLabel } from '../theme';
+// Header component. Brand row + prompt count + refresh + settings.
+// Theme toggle lives in the settings view only.
 
 export interface HeaderOptions {
   count?: number;
@@ -32,18 +31,6 @@ export function renderHeader(container: HTMLElement, opts: HeaderOptions = {}): 
     countEl.textContent = formatCount(opts.count, opts.count);
   }
   actions.appendChild(countEl);
-
-  // Theme toggle
-  const themeBtn = document.createElement('button');
-  themeBtn.className = 'app__btn app__btn--icon';
-  themeBtn.setAttribute('title', 'Toggle theme');
-  themeBtn.setAttribute('aria-label', 'Toggle theme');
-  themeBtn.textContent = themeLabel(getStoredTheme());
-  themeBtn.addEventListener('click', () => {
-    const next = cycleTheme();
-    themeBtn.textContent = themeLabel(next);
-  });
-  actions.appendChild(themeBtn);
 
   if (opts.onRefresh) {
     const refreshBtn = document.createElement('button');
@@ -82,6 +69,5 @@ export function updateHeaderCount(
 }
 
 function formatCount(visible: number, total: number): string {
-  if (visible === total) return `${total} prompt${total !== 1 ? 's' : ''}`;
   return `${visible} / ${total}`;
 }

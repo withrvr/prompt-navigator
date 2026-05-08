@@ -28,18 +28,42 @@ export function createSearchBar(opts: SearchBarOptions): HTMLElement {
   input.autocomplete = 'off';
   input.spellcheck = false;
 
-  input.addEventListener('input', () => onSearch(input.value));
+  // Clear button — shown only when the input has text
+  const clearBtn = document.createElement('button');
+  clearBtn.className = 'search-bar__clear';
+  clearBtn.setAttribute('aria-label', 'Clear search');
+  clearBtn.setAttribute('title', 'Clear search');
+  clearBtn.textContent = '✕';
+  clearBtn.hidden = true;
+
+  const syncClear = (): void => {
+    clearBtn.hidden = input.value.length === 0;
+  };
+
+  clearBtn.addEventListener('click', () => {
+    input.value = '';
+    onSearch('');
+    syncClear();
+    input.focus();
+  });
+
+  input.addEventListener('input', () => {
+    onSearch(input.value);
+    syncClear();
+  });
 
   // Clear on Escape
   input.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       input.value = '';
       onSearch('');
+      syncClear();
     }
   });
 
   wrapper.appendChild(icon);
   wrapper.appendChild(input);
+  wrapper.appendChild(clearBtn);
 
   // Favorites-only toggle
   if (onToggleFavorites) {

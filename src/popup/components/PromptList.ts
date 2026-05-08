@@ -12,6 +12,8 @@ export interface PromptListOptions {
   selectionMode?: boolean;
   selectedIds?: Set<string>;
   onSelect?: (id: string, selected: boolean) => void;
+  /** Pre-loaded favorites set — avoids a redundant storage read. */
+  favorites?: Set<string>;
 }
 
 /** Renders (or re-renders) the prompt list into `container`. */
@@ -22,6 +24,7 @@ export async function renderPromptList(
   const {
     prompts, onNavigate, highlight,
     selectionMode = false, selectedIds = new Set(), onSelect,
+    favorites: favsProp,
   } = opts;
   container.innerHTML = '';
 
@@ -30,7 +33,7 @@ export async function renderPromptList(
     return;
   }
 
-  const favorites = await getFavorites();
+  const favorites = favsProp ?? await getFavorites();
 
   const ul = document.createElement('ul');
   ul.className = 'prompt-list';
