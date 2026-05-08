@@ -740,3 +740,30 @@ body {
   margin-top: var(--pn-space-2);
   font-size: var(--pn-font-xs);
 }
+
+/* Settings hint with animated arrow on unsupported-site state */
+.empty-state__settings-hint {
+  margin-top: var(--pn-space-3);
+  display: flex;
+  align-items: center;
+  gap: var(--pn-space-2);
+  font-size: var(--pn-font-xs);
+  color: var(--pn-text-muted);
+  background: var(--pn-surface-2);
+  padding: var(--pn-space-2) var(--pn-space-3);
+  border-radius: var(--pn-radius-md);
+  border: 1px solid var(--pn-border);
+}
+
+.empty-state__arrow {
+  font-size: 16px;
+  display: inline-block;
+  animation: pn-arrow-bounce 1.4s ease-in-out infinite;
+  color: var(--pn-accent);
+}
+
+@keyframes pn-arrow-bounce {
+  0%, 100% { transform: translateX(0); opacity: 1; }
+  40%       { transform: translateX(6px); opacity: 0.7; }
+  60%       { transform: translateX(3px); opacity: 0.9; }
+}

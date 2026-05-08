@@ -1,6 +1,4 @@
 // Empty-state component. Renders when the popup has nothing useful to list.
-// Covers every non-happy path so the user always has an explanation + next step.
-// All strings run through t() so locale overrides work automatically.
 
 import { t } from '@/shared/i18n';
 
@@ -14,7 +12,6 @@ export type EmptyReason =
 interface EmptyStateOptions {
   reason: EmptyReason;
   detail?: string;
-  /** If set, shows a "Report broken selectors" link (used for the no-prompts state on known platforms). */
   reportUrl?: string;
 }
 
@@ -35,7 +32,6 @@ function getCopy(reason: EmptyReason): CopyCfg {
   }
 }
 
-/** Builds a pre-filled GitHub issue URL for a broken-selector report. */
 export function buildReportUrl(platform: string, pageUrl: string): string {
   const title = `Broken selectors: ${platform}`;
   const body = [
@@ -56,7 +52,6 @@ export function buildReportUrl(platform: string, pageUrl: string): string {
   );
 }
 
-/** Renders an informative empty state into `container`, replacing its content. */
 export function renderEmptyState(container: HTMLElement, opts: EmptyStateOptions): void {
   const { icon, heading, body } = getCopy(opts.reason);
 
@@ -67,6 +62,17 @@ export function renderEmptyState(container: HTMLElement, opts: EmptyStateOptions
     <h2 class="empty-state__heading">${escapeHtml(heading)}</h2>
     <p class="empty-state__body">${escapeHtml(opts.detail ?? body)}</p>
   `;
+
+  // For unsupported sites: animated arrow pointing toward the settings gear.
+  if (opts.reason === 'unsupported') {
+    const hint = document.createElement('div');
+    hint.className = 'empty-state__settings-hint';
+    hint.innerHTML = `
+      <span class="empty-state__arrow" aria-hidden="true">➜</span>
+      <span>Click <strong>⚙️</strong> Settings to see supported sites</span>
+    `;
+    el.appendChild(hint);
+  }
 
   if (opts.reportUrl) {
     const link = document.createElement('a');
