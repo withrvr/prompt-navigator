@@ -2,11 +2,10 @@
    surfaces — never pure black/white. Override per-theme in theme.css. */
 
 :root {
-  /* Sizing — fixed popup dimensions so every view fills the same space */
-  --pn-popup-width: 480px;
-  --pn-popup-height: 680px;
-  --pn-popup-min-height: 400px;
-  --pn-popup-max-height: min(680px, 100vh);
+  /* Sizing */
+  --pn-popup-width: 360px;
+  --pn-popup-min-height: 240px;
+  --pn-popup-max-height: min(600px, 100vh);
 
   --pn-radius-sm: 6px;
   --pn-radius-md: 10px;
