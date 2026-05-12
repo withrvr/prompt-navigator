@@ -1,7 +1,6 @@
 // PromptItem component. Renders a single row in the prompt list.
 
 import type { Prompt } from '@/shared/types';
-import { attachTooltip } from './Tooltip';
 
 const MAX_DISPLAY_CHARS = 200;
 const COPY_FEEDBACK_MS = 1200;
@@ -61,9 +60,8 @@ export function createPromptItem(opts: PromptItemOptions): HTMLLIElement {
   if (!selectionMode) {
     textSpan.addEventListener('click', () => onNavigate(prompt.id));
   }
-  // Show full text in a tooltip on hover (text may be truncated at MAX_DISPLAY_CHARS).
   if (prompt.text.length > 0) {
-    attachTooltip(textSpan, prompt.text);
+    textSpan.title = prompt.text;
   }
 
   // Actions wrapper
