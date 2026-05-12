@@ -1,6 +1,6 @@
 # 🧭 Prompt Navigator
 
-> Jump to any prompt in your AI chat. Lists, searches, favorites, and exports your messages on **ChatGPT**, **Claude**, and **Gemini**.
+> Jump to any prompt in your AI chat. Lists, searches, favorites, and exports your messages on **ChatGPT**, **Claude**, **Gemini**, **Perplexity**, **Grok**, **DeepSeek**, **Mistral**, **Kimi**, and **Meta AI**.
 
 A clean, fast, eye-friendly browser extension. Click the toolbar icon → see every message you sent in this conversation → click any item to scroll to it instantly.
 
@@ -14,16 +14,18 @@ A clean, fast, eye-friendly browser extension. Click the toolbar icon → see ev
 |---|---|
 | 🧭 Navigate | Click any prompt to scroll to it — with a purple ring flash to confirm |
 | 🔍 Search | Live substring filter with match highlighting |
-| 🔄 Refresh | Manual refresh button to re-scan after the page mutates |
-| ⭐ Favorites | Star/unstar prompts; persisted across popup close |
+| 🔄 Refresh | Re-scan button always visible in the header |
+| ⭐ Favorites | Star/unstar prompts; one-click access from the header |
+| 🕐 Recent | Header button shows the last 10 prompts you navigated to |
+| 💬 Tooltip | Hover any prompt to read the full text — no more truncation guesswork |
 | 📋 Copy | One-click copy to clipboard per prompt |
-| 📤 Export | JSON · CSV · PDF (via browser print dialog) |
+| 📤 Export | JSON · CSV · PDF — all prompts or a selected subset |
 | 🌗 Theme | Auto (OS) / Dark / Light — purple accent, never pure black/white |
-| ⚙️ Settings | Theme, support link, GitHub — accessible from the header |
-| ⚠️ Error states | Friendly messages for unsupported sites, empty chats, load errors |
+| ⚙️ Settings | Theme, floating button toggle, support link — accessible from the header |
+| 🖥️ Floating panel | Optional in-page floating button that opens the navigator without leaving the chat |
+| ⚠️ Error states | Unsupported sites show an inline list of all supported platforms |
 
-**Supported platforms (v1):** ChatGPT · Claude · Gemini  
-**v1.1:** Perplexity · Grok · DeepSeek · Mistral · Kimi · Meta AI
+**Supported platforms:** ChatGPT · Claude · Gemini · Perplexity · Grok · DeepSeek · Mistral · Kimi · Meta AI
 
 ---
 
@@ -69,15 +71,16 @@ npm run build:firefox
 
 ## Usage
 
-1. Open ChatGPT, Claude, or Gemini and start (or resume) a conversation.
-2. Click the **🧭** icon in your browser toolbar.
+1. Open any supported AI chat and start (or resume) a conversation.
+2. Click the **🧭** icon in your browser toolbar (or use the floating panel if enabled).
 3. Your prompts appear as a numbered list — click any to jump to it.
 4. Use the **search bar** to filter by keyword.
-5. Click **⭐** to favorite a prompt (remembered next time).
-6. Click **📋** to copy a prompt to the clipboard.
-7. Click **📤 Export** to download as JSON, CSV, or PDF.
-8. Click **⚙️** (gear) to open Settings and change the theme.
-9. Click **🔄** to refresh the list after the page has loaded new turns.
+5. Hover any prompt to read the **full text** in a tooltip.
+6. Click **⭐** in the header to open your favorites, or star individual prompts to save them.
+7. Click **📋** to copy a prompt to the clipboard.
+8. Click **📤 Export** to download as JSON, CSV, or PDF.
+9. Click **⚙️** (gear) to open Settings and change the theme or toggle the floating panel.
+10. Click **🔄** to manually refresh the list if the page has loaded new turns.
 
 ---
 

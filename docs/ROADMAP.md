@@ -49,6 +49,15 @@
 - GitHub Actions release workflow: tag push → build Chrome+Firefox → publish GitHub Release with versioned zips
 - Recent Prompts view: 🕐 button in header, last 10 navigated prompts, platform+age meta, copy, clear
 
+## ✅ Done — v0.2.0 (`add_on_to_kanban_feature_also`)
+
+- **Kimi scroll fix**: custom `scrollTo` via `scrollIntoView`; `scroll.ts` recognises `overflow:overlay`
+- **Hover tooltip**: `Tooltip.ts` component (400ms delay, `position:fixed`, single reused element) on every prompt
+- **Favorites + Refresh in header**: both buttons always visible from first render; Favorites nav from header
+- **URL_CHANGED auto-refresh**: content script broadcasts on SPA navigation; popup + floating panel re-fetch automatically
+- **Unsupported-site inline list**: replaced animated arrow with formatted list of all 9 supported platforms
+- **Settings cleanup**: removed redundant "Manage favorites" link from Settings; dropped unused `navigate` param
+
 ## 🌌 Backlog
 
 - AI-generated summary/title per prompt cluster (heuristic or LLM API)

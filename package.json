@@ -1,6 +1,6 @@
 {
   "name": "prompt-navigator",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Browser extension that lists every user prompt in your AI chat — click to jump, search, favorite, and export.",
   "license": "MIT",
