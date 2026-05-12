@@ -40,6 +40,15 @@
 - Safari Web Extension build script (`npm run build:safari`, macOS + Xcode)
 - i18n foundation: typed `Strings` interface + `t(key)` lookup, English locale table
 
+## ✅ Done — kanban fixes (`kanban_todo_changes`)
+
+- Fix floating navigator button: move flex layout into shadow root, correct PANEL_H 700→600
+- Fix Gemini "you said" prefix: regex catches all variants (`/^you\s+said[:\s,]*/i`)
+- Favorites footer consistency: All/None visibility-toggled (no layout shift), matches Footer.ts
+- Favorites export menu: wrapped in `footer__right` (position:relative) so dropdown anchors correctly
+- GitHub Actions release workflow: tag push → build Chrome+Firefox → publish GitHub Release with versioned zips
+- Recent Prompts view: 🕐 button in header, last 10 navigated prompts, platform+age meta, copy, clear
+
 ## 🌌 Backlog
 
 - AI-generated summary/title per prompt cluster (heuristic or LLM API)
@@ -47,5 +56,4 @@
 - Full i18n migration: wire `t()` into all remaining UI components
 - Additional locale tables (e.g. `fr`, `de`, `zh`, `ja`)
 - Per-platform "report broken selector" — also shown from the Info view
-- Bulk export: "select all" / "select none" buttons
 - Safari App Store submission guide

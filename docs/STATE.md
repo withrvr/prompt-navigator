@@ -4,9 +4,20 @@
 
 ## Current branch
 
-`claude/v1.2-backlog` — all remaining backlog features, built on top of v1.1.
+`kanban_todo_changes` — kanban backlog fixes, built on top of `feat_fix/github_issues_1_to_3`.
 
-## v1.2 progress
+## Kanban backlog progress
+
+| # | Task | Status |
+|---|------|--------|
+| 1 | Fix floating navigator button layout (shadow DOM flex + PANEL_H) | ✅ committed |
+| 2 | Fix Gemini "you said" prefix stripping (regex, all variants) | ✅ committed |
+| 3 | Favorites footer Select/Done consistency (visibility-toggle, no layout shift) | ✅ committed |
+| 4 | Favorites export menu positioning (footer__right position:relative) | ✅ committed |
+| 5 | GitHub Actions release workflow (auto-build Chrome+Firefox zips on tag push) | ✅ committed |
+| 6 | Recent Prompts view (last 10 navigated prompts, platform+age meta, clear) | ✅ committed |
+
+## v1.2 progress (prior branch — all done)
 
 | # | Feature | Status |
 |---|---|---|
@@ -20,37 +31,42 @@
 
 **57 tests passing** (unchanged — new features are UI-only).
 
-## v1.2 feature details
+## Fix details
 
-### Report broken selectors
-When a known platform returns zero prompts, the empty state shows a pre-filled
-GitHub issue link with the platform name and page URL filled in.
+### Floating button layout fix
+The host element's inline `display:flex` only affects light-DOM children — the
+shadow root's `iframe` and `button` were completely outside that flex context.
+Fixed by creating a `.pn-wrapper` div *inside* the shadow that owns the
+`position:fixed` + `flex-direction:column` layout.  `PANEL_H` corrected from
+700 → 600px to match `--pn-popup-height`, eliminating the 100px blank gap.
 
-### Bulk export
-A "Select" toggle in the footer enables checkbox mode. Export then applies only
-to checked prompts. Export label updates to "Export (N)".
+### Gemini "you said" fix
+Replaced the hard-coded `['you said:', 'you said ']` array with a single
+regex `/^you\s+said[:\s,]*/i` that covers all observed Gemini UI variants
+(with/without colon, newline, comma, any capitalisation).
 
-### Floating navigator button
-Settings → In-page panel → toggle. Injects a 🧭 button into the host page
-(shadow-DOM isolated). Clicking it opens an iframe panel showing the popup UI.
-Real-time: toggling the setting while on an AI page updates without reload.
+### Favorites footer consistency
+The All/None buttons were conditionally inserted/removed on every Select toggle,
+causing a layout shift.  Now uses the same `visibility:hidden /
+footer__select-all-group--visible` pattern as the main `Footer.ts`.
 
-### Drag-to-reorder favorites
-Settings → Manage favorites & reorder. Favorites are now stored as an ordered
-array. The Favorites view uses HTML5 drag-and-drop; drops persist immediately.
+### Favorites export menu fix
+The `export-menu` (`position:absolute`) was appended directly to
+`.app__footer` which has no `position:relative`, so the dropdown anchored to
+the wrong ancestor.  Wrapped the export button and menu in a `footer__right`
+div (`position:relative`), matching the main footer structure.
 
-### Custom keyboard shortcuts
-Always-on in the popup: 1-9 jump, ↑↓ navigate. Configurable in Settings →
-Keyboard shortcuts: click a key badge and press any key to reassign copy/favorite.
+### GitHub release workflow
+`.github/workflows/release.yml` — push a version tag (`v1.0.0`) and the
+workflow automatically builds Chrome + Firefox, packages versioned zips,
+generates a changelog from git log, and publishes a GitHub Release.
+See `docs/RELEASE.md` for developer and user instructions.
 
-### Safari build
-`npm run build:safari` (macOS only). Calls `xcrun safari-web-extension-converter`
-on `dist/` and produces an Xcode project at `dist-safari/`. Instructions printed.
-
-### i18n foundation
-`src/shared/i18n.ts` — typed `Strings` interface for all user-visible copy,
-`en` locale table, `t(key)` lookup with English fallback. EmptyState migrated
-as the reference implementation.
+### Recent Prompts view
+New `🕐` button in the main header opens a "Recent" view showing the last 10
+prompts the user navigated to.  Each entry stores `{ text, platform, url,
+usedAt }`.  Deduplicates by text — revisiting the same prompt moves it to
+the front.  Clear button wipes the history.
 
 ## Run locally
 
@@ -62,7 +78,6 @@ npm install && npm run build
 
 ## Next
 
-- Merge v1.2 → v1.1 → v1 → submit to Chrome Web Store + Mozilla AMO
-- User-side testing of v1.2 features
-- Optionally: wire t() into remaining UI components for a given locale
-- AI-generated summaries / conversation switcher (future)
+- Merge kanban_todo_changes → feat_fix/github_issues_1_to_3 → main
+- Create first versioned release: `npm version patch && git push --follow-tags`
+- Store submissions (Chrome Web Store, Mozilla AMO)
