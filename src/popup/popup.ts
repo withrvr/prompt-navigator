@@ -8,14 +8,18 @@ import { renderMainView } from './views/main';
 import { renderSettingsView } from './views/settings';
 import { renderInfoView } from './views/info';
 import { renderFavoritesView } from './views/favorites';
+import { renderRecentView } from './views/recent';
 
-export type ViewName = 'main' | 'settings' | 'info' | 'favorites';
+export type ViewName = 'main' | 'settings' | 'info' | 'favorites' | 'recent';
 
 let root: HTMLElement;
 
 export function navigate(view: ViewName): void {
   root.innerHTML = '';
-  document.body.classList.toggle('pn-list-view', view === 'main' || view === 'favorites');
+  document.body.classList.toggle(
+    'pn-list-view',
+    view === 'main' || view === 'favorites' || view === 'recent',
+  );
   switch (view) {
     case 'main':
       void renderMainView(root, navigate);
@@ -28,6 +32,9 @@ export function navigate(view: ViewName): void {
       break;
     case 'favorites':
       void renderFavoritesView(root, () => navigate('main'));
+      break;
+    case 'recent':
+      void renderRecentView(root, () => navigate('main'));
       break;
   }
 }

@@ -9,6 +9,8 @@ import { logger } from './logger';
 
 const FAVORITES_KEY = 'pn:favorites';
 const SETTINGS_KEY = 'pn:settings';
+const RECENT_KEY = 'pn:recent';
+const MAX_RECENT = 10;
 
 // ── Favorites ──────────────────────────────────────────────────────────────
 // Stored as an ordered string[] so the user can reorder their favorites list.
@@ -72,6 +74,47 @@ export async function saveSettings(patch: Partial<PnSettings>): Promise<void> {
 /** Returns favorites as a Set for O(1) membership testing. */
 export async function getFavorites(): Promise<Set<string>> {
   return new Set(await getFavoritesOrdered());
+}
+
+// ── Recent prompts ─────────────────────────────────────────────────────────
+// Stores up to MAX_RECENT entries of prompts the user has navigated to.
+
+export interface RecentPrompt {
+  text: string;
+  platform: string;
+  url: string;
+  usedAt: number;
+}
+
+export async function getRecentPrompts(): Promise<RecentPrompt[]> {
+  try {
+    const result = await browser.storage.local.get(RECENT_KEY);
+    const raw = result[RECENT_KEY];
+    if (Array.isArray(raw)) return raw as RecentPrompt[];
+  } catch (err) {
+    logger.warn('storage: getRecentPrompts failed', err);
+  }
+  return [];
+}
+
+export async function addRecentPrompt(entry: RecentPrompt): Promise<void> {
+  try {
+    const existing = await getRecentPrompts();
+    // Deduplicate by text — move to front if already present
+    const filtered = existing.filter((r) => r.text !== entry.text);
+    const updated = [entry, ...filtered].slice(0, MAX_RECENT);
+    await browser.storage.local.set({ [RECENT_KEY]: updated });
+  } catch (err) {
+    logger.warn('storage: addRecentPrompt failed', err);
+  }
+}
+
+export async function clearRecentPrompts(): Promise<void> {
+  try {
+    await browser.storage.local.remove(RECENT_KEY);
+  } catch (err) {
+    logger.warn('storage: clearRecentPrompts failed', err);
+  }
 }
 
 export async function toggleFavorite(text: string): Promise<boolean> {

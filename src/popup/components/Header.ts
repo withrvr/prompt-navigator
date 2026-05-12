@@ -5,6 +5,7 @@ export interface HeaderOptions {
   count?: number;
   onRefresh?: () => void;
   onSettings?: () => void;
+  onRecent?: () => void;
 }
 
 /** Renders the header bar inside `container` and returns it for later updates. */
@@ -31,6 +32,16 @@ export function renderHeader(container: HTMLElement, opts: HeaderOptions = {}): 
     countEl.textContent = formatCount(opts.count, opts.count);
   }
   actions.appendChild(countEl);
+
+  if (opts.onRecent) {
+    const recentBtn = document.createElement('button');
+    recentBtn.className = 'app__btn app__btn--icon';
+    recentBtn.setAttribute('aria-label', 'Recent prompts');
+    recentBtn.setAttribute('title', 'Recent');
+    recentBtn.textContent = '🕐';
+    recentBtn.addEventListener('click', opts.onRecent);
+    actions.appendChild(recentBtn);
+  }
 
   if (opts.onRefresh) {
     const refreshBtn = document.createElement('button');

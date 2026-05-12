@@ -11,7 +11,7 @@ import { renderPromptList } from '../components/PromptList';
 import { renderEmptyState, buildReportUrl } from '../components/EmptyState';
 import { createSearchBar, filterPrompts, filterFavorites } from '../components/SearchBar';
 import { renderFooter } from '../components/Footer';
-import { getFavorites, getSettings } from '@/shared/storage';
+import { getFavorites, getSettings, addRecentPrompt } from '@/shared/storage';
 import { registerKeyboardShortcuts } from '../keyboard';
 import type { ViewName } from '../popup';
 
@@ -52,7 +52,10 @@ export async function renderMainView(
   root.appendChild(body);
   root.appendChild(footerContainer);
 
-  renderHeader(headerContainer, { onSettings: () => navigate('settings') });
+  renderHeader(headerContainer, {
+    onSettings: () => navigate('settings'),
+    onRecent: () => navigate('recent'),
+  });
   renderEmptyState(body, { reason: 'loading' });
 
   const tabId = await getActiveTabId();
@@ -66,7 +69,10 @@ export async function renderMainView(
     const response = await sendToContent<PromptsResponse>(tabId, { type: 'GET_PROMPTS' });
 
     if (!response) {
-      renderHeader(headerContainer, { onSettings: () => navigate('settings') });
+      renderHeader(headerContainer, {
+        onSettings: () => navigate('settings'),
+        onRecent: () => navigate('recent'),
+      });
       searchContainer.hidden = true;
       searchContainer.innerHTML = '';
       footerContainer.innerHTML = '';
@@ -90,6 +96,7 @@ export async function renderMainView(
       count: prompts.length,
       onRefresh: () => void fetchAndRender(),
       onSettings: () => navigate('settings'),
+      onRecent: () => navigate('recent'),
     });
 
     const refreshFooter = (): void => {
@@ -183,8 +190,17 @@ export async function renderMainView(
       await renderPromptList(body, {
         prompts: list,
         onNavigate: async (promptId) => {
-          // Save scroll position before navigating away
           sessionStorage.setItem(scrollKey, String(body.scrollTop));
+          // Persist to recent-prompts history before closing
+          const prompt = list.find((p) => p.id === promptId);
+          if (prompt) {
+            void addRecentPrompt({
+              text: prompt.text,
+              platform,
+              url: pageUrl ?? '',
+              usedAt: Date.now(),
+            });
+          }
           await sendToContent(tabId, { type: 'SCROLL_TO', promptId });
           window.close();
         },
