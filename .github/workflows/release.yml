@@ -1,0 +1,140 @@
+name: Release
+
+# Triggers on a version tag push (e.g. git tag v0.2.0 && git push --tags).
+# Also supports a manual run with a custom tag so you can re-release without
+# creating a new commit.
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release (e.g. v0.2.0) — must already exist locally'
+        required: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # needed to create the GitHub Release + upload assets
+
+    steps:
+      # ── 1. Checkout full history so we can compute a changelog ───────────
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ── 2. Node setup ──────────────────────────────────────────────────
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # ── 3. Install dependencies ────────────────────────────────────────
+      - name: Install
+        run: npm ci
+
+      # ── 4. Quality gates ───────────────────────────────────────────────
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm run test
+
+      # ── 5. Build Chrome (MV3) ──────────────────────────────────────────
+      - name: Build Chrome
+        run: npm run build
+
+      # ── 6. Build Firefox ──────────────────────────────────────────────
+      - name: Build Firefox
+        run: npm run build:firefox
+
+      # ── 7. Package zips ───────────────────────────────────────────────
+      - name: Package zips
+        run: npm run package
+
+      # ── 8. Determine release tag ───────────────────────────────────────
+      - name: Set TAG
+        id: tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "TAG=${{ github.event.inputs.tag }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "TAG=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          fi
+
+      # ── 9. Generate changelog (commits since previous tag) ─────────────
+      - name: Generate changelog
+        id: changelog
+        run: |
+          CURRENT_TAG="${{ steps.tag.outputs.TAG }}"
+          # Find the previous tag; fall back to the first commit if none exists
+          PREV_TAG=$(git tag --sort=-version:refname | grep -v "^${CURRENT_TAG}$" | head -1 || true)
+          if [ -z "$PREV_TAG" ]; then
+            RANGE="HEAD"
+          else
+            RANGE="${PREV_TAG}..HEAD"
+          fi
+          echo "Changelog from ${PREV_TAG:-'(initial)'} → ${CURRENT_TAG}"
+          # Collect commit subjects grouped by type (feat/fix/chore/docs/other)
+          COMMITS=$(git log "${RANGE}" --no-merges --format="* %s (%h)" | head -80)
+          # Write to multi-line output
+          {
+            echo "BODY<<CHANGELOG_EOF"
+            echo "## What's new in ${CURRENT_TAG}"
+            echo ""
+            if [ -n "$PREV_TAG" ]; then
+              echo "Changes since \`${PREV_TAG}\`:"
+            else
+              echo "Initial release:"
+            fi
+            echo ""
+            echo "${COMMITS}"
+            echo ""
+            echo "---"
+            echo ""
+            echo "### Install without a store"
+            echo ""
+            echo "Download the zip for your browser below, then follow the steps:"
+            echo ""
+            echo "**Chrome / Edge / Brave (Chromium)**"
+            echo "1. Download \`prompt-navigator-chrome-${CURRENT_TAG}.zip\` and unzip it."
+            echo "2. Go to \`chrome://extensions\`, enable **Developer mode**."
+            echo "3. Click **Load unpacked** and select the unzipped folder."
+            echo ""
+            echo "**Firefox**"
+            echo "1. Download \`prompt-navigator-firefox-${CURRENT_TAG}.zip\`."
+            echo "2. Go to \`about:addons\` → gear icon → **Install Add-on From File…**"
+            echo "3. Select the zip (Firefox accepts packed zips directly)."
+            echo ""
+            echo "**Safari** — Safari builds require macOS + Xcode."
+            echo "Clone the repo and run \`npm run build:safari\`, then open the generated"
+            echo "Xcode project in \`dist-safari/\` and run the app to install the extension."
+            echo "CHANGELOG_EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      # ── 10. Rename zips to include version (nicer download filenames) ──
+      - name: Rename zips
+        run: |
+          TAG="${{ steps.tag.outputs.TAG }}"
+          mv dist/chrome.zip "dist/prompt-navigator-chrome-${TAG}.zip"
+          mv dist-firefox/firefox.zip "dist-firefox/prompt-navigator-firefox-${TAG}.zip"
+
+      # ── 11. Create GitHub Release ─────────────────────────────────────
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.TAG }}
+          name: "Prompt Navigator ${{ steps.tag.outputs.TAG }}"
+          body: ${{ steps.changelog.outputs.BODY }}
+          draft: false
+          prerelease: ${{ contains(steps.tag.outputs.TAG, '-') }}
+          files: |
+            dist/prompt-navigator-chrome-${{ steps.tag.outputs.TAG }}.zip
+            dist-firefox/prompt-navigator-firefox-${{ steps.tag.outputs.TAG }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
