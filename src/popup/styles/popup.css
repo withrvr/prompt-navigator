@@ -815,6 +815,27 @@ body.pn-list-view .app {
   60%       { transform: translateX(3px); opacity: 0.9; }
 }
 
+/* ── No-prompts troubleshooting steps ───────────────────────────────────── */
+
+.empty-state__steps {
+  margin-top: var(--pn-space-3);
+  padding-left: var(--pn-space-4);
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pn-space-2);
+}
+
+.empty-state__steps li {
+  font-size: var(--pn-font-sm);
+  color: var(--pn-text-muted);
+  line-height: 1.5;
+}
+
+.empty-state__steps strong {
+  color: var(--pn-text);
+}
+
 /* ── Prompt hover tooltip ────────────────────────────────────────────────── */
 
 #pn-tooltip {

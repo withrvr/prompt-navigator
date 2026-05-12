@@ -106,7 +106,7 @@ const en: Strings = {
   'empty.loading.heading': 'Loading…',
   'empty.loading.body': 'Scanning the conversation.',
   'empty.noPrompts.heading': 'No messages yet',
-  'empty.noPrompts.body': 'Start chatting and your prompts will appear here.',
+  'empty.noPrompts.body': 'Already chatting but nothing shows up?',
   'empty.noMatch.heading': 'No matches',
   'empty.noMatch.body': 'Try a different search term.',
   'empty.noFavs.body': 'No starred prompts yet. Tap ⭐ on a prompt to favorite it.',

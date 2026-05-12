@@ -84,7 +84,35 @@ export function renderEmptyState(container: HTMLElement, opts: EmptyStateOptions
     el.appendChild(siteList);
   }
 
-  if (opts.reportUrl) {
+  if (opts.reason === 'no-prompts') {
+    const steps = document.createElement('ol');
+    steps.className = 'empty-state__steps';
+
+    const s1 = document.createElement('li');
+    s1.innerHTML = 'Hit <strong>🔄 Refresh</strong> in the top-right header';
+
+    const s2 = document.createElement('li');
+    s2.textContent = 'Reload the page, then open the extension again';
+
+    const s3 = document.createElement('li');
+    if (opts.reportUrl) {
+      s3.innerHTML = 'Still empty? It may be a bug or unsupported — ';
+      const link = document.createElement('a');
+      link.className = 'settings-link';
+      link.href = opts.reportUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = 'report it';
+      s3.appendChild(link);
+    } else {
+      s3.textContent = 'Still empty? This site may not be fully supported yet';
+    }
+
+    steps.appendChild(s1);
+    steps.appendChild(s2);
+    steps.appendChild(s3);
+    el.appendChild(steps);
+  } else if (opts.reportUrl) {
     const link = document.createElement('a');
     link.className = 'settings-link empty-state__report';
     link.href = opts.reportUrl;
