@@ -14,8 +14,9 @@ import type { PlatformId } from '@/shared/types';
 const USER_QUERY_SELECTOR = 'user-query';
 const TEXT_CHILD_SELECTORS = ['.query-text', '.user-query-content', 'p'];
 
-// Prefixes injected by Gemini's own UI that we strip from user-visible text.
-const STRIP_PREFIXES = ['you said:', 'you said '];
+// Regex that matches "You said" (any capitalisation) followed by optional
+// colon, comma, or whitespace — covers every variant Gemini currently renders.
+const STRIP_PREFIX_RE = /^you\s+said[:\s,]*/i;
 
 export class GeminiAdapter implements PromptAdapter {
   readonly id: PlatformId = 'gemini';
@@ -64,11 +65,5 @@ function extractGeminiText(el: HTMLElement): string {
 }
 
 function stripKnownPrefixes(text: string): string {
-  const lower = text.toLowerCase();
-  for (const prefix of STRIP_PREFIXES) {
-    if (lower.startsWith(prefix)) {
-      return text.slice(prefix.length).trimStart();
-    }
-  }
-  return text;
+  return text.replace(STRIP_PREFIX_RE, '').trimStart();
 }
