@@ -267,11 +267,11 @@ export async function renderFavoritesView(root: HTMLElement, onBack: () => void)
     body.appendChild(ul);
 
     for (let i = 0; i < visible.length; i++) {
-      ul.appendChild(buildItem(visible[i], i, visible));
+      ul.appendChild(buildItem(visible[i]));
     }
   };
 
-  const buildItem = (text: string, visIdx: number, visibleList: string[]): HTMLLIElement => {
+  const buildItem = (text: string): HTMLLIElement => {
     const realIdx = ordered.indexOf(text);
     const li = document.createElement('li');
     li.className = 'fav-item';
@@ -367,7 +367,6 @@ export async function renderFavoritesView(root: HTMLElement, onBack: () => void)
       });
     }
 
-    void visIdx; void visibleList; // suppress unused warnings
     return li;
   };
 

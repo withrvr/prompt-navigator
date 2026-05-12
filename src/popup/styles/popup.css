@@ -668,16 +668,16 @@ body.pn-list-view .app {
 
 /* ── Recent prompts view ─────────────────────────────────────────────────── */
 
+/* Recent items share .prompt-item base; override direction, gap, and cursor. */
 .recent-item {
-  flex-direction: column;
+  flex-direction: row;
   align-items: flex-start;
-  gap: var(--pn-space-1);
+  gap: var(--pn-space-2);
   cursor: default;
 }
 
 .recent-item .prompt-item__actions {
-  /* Actions are always visible on recent items (no hover required) */
-  opacity: 1;
+  opacity: 1; /* always visible — no hover needed */
 }
 
 .recent-item__text-group {
@@ -686,18 +686,11 @@ body.pn-list-view .app {
   gap: 2px;
   flex: 1;
   min-width: 0;
-  width: 100%;
 }
 
 .recent-item__meta {
   font-size: var(--pn-font-xs);
   color: var(--pn-text-muted);
-}
-
-/* Align index badge + text group + actions in a row */
-.recent-item {
-  flex-direction: row;
-  align-items: flex-start;
 }
 
 /* ── Favorites management view ───────────────────────────────────────────── */
