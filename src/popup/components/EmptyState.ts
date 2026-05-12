@@ -63,15 +63,25 @@ export function renderEmptyState(container: HTMLElement, opts: EmptyStateOptions
     <p class="empty-state__body">${escapeHtml(opts.detail ?? body)}</p>
   `;
 
-  // For unsupported sites: animated arrow pointing toward the settings gear.
+  // For unsupported sites: show an inline list of all supported platforms.
   if (opts.reason === 'unsupported') {
-    const hint = document.createElement('div');
-    hint.className = 'empty-state__settings-hint';
-    hint.innerHTML = `
-      <span class="empty-state__arrow" aria-hidden="true">➜</span>
-      <span>Click <strong>⚙️</strong> Settings to see supported sites</span>
+    const siteList = document.createElement('div');
+    siteList.className = 'empty-state__site-list';
+    siteList.innerHTML = `
+      <p class="empty-state__site-list-heading">Supported sites</p>
+      <ul class="empty-state__sites">
+        <li><span class="empty-state__site-name">ChatGPT</span><span class="empty-state__site-url">chatgpt.com</span></li>
+        <li><span class="empty-state__site-name">Claude</span><span class="empty-state__site-url">claude.ai</span></li>
+        <li><span class="empty-state__site-name">Gemini</span><span class="empty-state__site-url">gemini.google.com</span></li>
+        <li><span class="empty-state__site-name">Perplexity</span><span class="empty-state__site-url">perplexity.ai</span></li>
+        <li><span class="empty-state__site-name">Grok</span><span class="empty-state__site-url">grok.com · x.com/i/grok</span></li>
+        <li><span class="empty-state__site-name">DeepSeek</span><span class="empty-state__site-url">chat.deepseek.com</span></li>
+        <li><span class="empty-state__site-name">Mistral</span><span class="empty-state__site-url">chat.mistral.ai</span></li>
+        <li><span class="empty-state__site-name">Kimi</span><span class="empty-state__site-url">kimi.com</span></li>
+        <li><span class="empty-state__site-name">Meta AI</span><span class="empty-state__site-url">meta.ai</span></li>
+      </ul>
     `;
-    el.appendChild(hint);
+    el.appendChild(siteList);
   }
 
   if (opts.reportUrl) {

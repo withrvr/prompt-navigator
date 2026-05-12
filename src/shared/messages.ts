@@ -11,6 +11,9 @@ export type Message =
   | { type: 'GET_PROMPTS' }
   | { type: 'SCROLL_TO'; promptId: string };
 
+// Runtime messages flow from content script → popup (via browser.runtime.sendMessage).
+export type RuntimeMessage = { type: 'URL_CHANGED'; url: string };
+
 export type ResponseFor<M extends Message> = M extends { type: 'PING' }
   ? { ok: true }
   : M extends { type: 'GET_PROMPTS' }

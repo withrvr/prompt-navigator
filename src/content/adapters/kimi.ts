@@ -5,6 +5,11 @@
 // hints in different builds, so we lead with attribute-based selectors
 // and fall back to common class patterns.
 //
+// Scroll note: Kimi uses overflow:overlay on its chat container (a deprecated
+// but Chrome-supported value). safeScrollTo already handles this, but we also
+// provide a scrollIntoView fallback since Kimi — unlike Claude — does not
+// hijack that method.
+//
 // Selector chain:
 //   1. div[data-role="user"]            — semantic
 //   2. div[data-message-role="user"]    — alternate semantic
@@ -24,4 +29,7 @@ export const KimiAdapter = makeAdapter({
     'div.user-question',
     'div[class*="user_"]',
   ],
+  scrollTo: (el) => {
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  },
 });

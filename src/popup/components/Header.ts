@@ -6,6 +6,7 @@ export interface HeaderOptions {
   onRefresh?: () => void;
   onSettings?: () => void;
   onRecent?: () => void;
+  onFavorites?: () => void;
 }
 
 /** Renders the header bar inside `container` and returns it for later updates. */
@@ -41,6 +42,16 @@ export function renderHeader(container: HTMLElement, opts: HeaderOptions = {}): 
     recentBtn.textContent = '🕐';
     recentBtn.addEventListener('click', opts.onRecent);
     actions.appendChild(recentBtn);
+  }
+
+  if (opts.onFavorites) {
+    const favBtn = document.createElement('button');
+    favBtn.className = 'app__btn app__btn--icon';
+    favBtn.setAttribute('aria-label', 'Favourites');
+    favBtn.setAttribute('title', 'Favourites');
+    favBtn.textContent = '⭐';
+    favBtn.addEventListener('click', opts.onFavorites);
+    actions.appendChild(favBtn);
   }
 
   if (opts.onRefresh) {

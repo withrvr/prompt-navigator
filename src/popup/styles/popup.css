@@ -814,3 +814,75 @@ body.pn-list-view .app {
   40%       { transform: translateX(6px); opacity: 0.7; }
   60%       { transform: translateX(3px); opacity: 0.9; }
 }
+
+/* ── Prompt hover tooltip ────────────────────────────────────────────────── */
+
+#pn-tooltip {
+  position: fixed;
+  z-index: 9999;
+  max-width: 320px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: var(--pn-space-2) var(--pn-space-3);
+  background: var(--pn-surface);
+  border: 1px solid var(--pn-border);
+  border-radius: var(--pn-radius-md);
+  box-shadow: var(--pn-shadow-md);
+  font-size: var(--pn-font-xs);
+  line-height: 1.55;
+  color: var(--pn-text);
+  white-space: pre-wrap;
+  word-break: break-word;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--pn-transition);
+}
+
+#pn-tooltip.pn-tooltip--visible {
+  opacity: 1;
+}
+
+/* ── Unsupported site: supported platforms list ───────────────────────────── */
+
+.empty-state__site-list {
+  width: 100%;
+  margin-top: var(--pn-space-3);
+  text-align: left;
+}
+
+.empty-state__site-list-heading {
+  font-size: var(--pn-font-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--pn-text-muted);
+  margin-bottom: var(--pn-space-2);
+}
+
+.empty-state__sites {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.empty-state__sites li {
+  display: flex;
+  align-items: baseline;
+  gap: var(--pn-space-2);
+  padding: 3px 0;
+}
+
+.empty-state__site-name {
+  font-size: var(--pn-font-sm);
+  color: var(--pn-text);
+  min-width: 80px;
+  flex-shrink: 0;
+}
+
+.empty-state__site-url {
+  font-size: var(--pn-font-xs);
+  color: var(--pn-text-muted);
+}

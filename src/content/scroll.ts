@@ -50,6 +50,7 @@ function findScrollableAncestor(el: HTMLElement): HTMLElement {
 function isScrollable(el: HTMLElement): boolean {
   const style = getComputedStyle(el);
   const overflowY = style.overflowY;
-  if (overflowY !== 'auto' && overflowY !== 'scroll') return false;
+  // 'overlay' is a deprecated Chrome-only value that still appears on some sites (e.g. Kimi).
+  if (overflowY !== 'auto' && overflowY !== 'scroll' && overflowY !== 'overlay') return false;
   return el.scrollHeight > el.clientHeight + 1;
 }

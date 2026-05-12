@@ -21,6 +21,8 @@ export interface CommonAdapterConfig {
   selectors: string[];
   /** Optional: pull text from a different element than the matched node. */
   textFor?: (el: HTMLElement) => string;
+  /** Optional: override the default safeScrollTo behaviour for this platform. */
+  scrollTo?: (el: HTMLElement) => void;
 }
 
 /** Build a concrete adapter from a config object. */
@@ -61,7 +63,11 @@ export function makeAdapter(cfg: CommonAdapterConfig): PromptAdapter {
     },
 
     scrollTo(prompt: DomPrompt): void {
-      safeScrollTo(prompt.element);
+      if (cfg.scrollTo) {
+        cfg.scrollTo(prompt.element);
+      } else {
+        safeScrollTo(prompt.element);
+      }
     },
 
     observe(onChange: () => void): () => void {

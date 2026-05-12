@@ -4,7 +4,7 @@
 
 import browser from '@/shared/browser';
 import { logger } from '@/shared/logger';
-import type { Message } from '@/shared/messages';
+import type { Message, RuntimeMessage } from '@/shared/messages';
 import type { Prompt, PromptsResponse } from '@/shared/types';
 import { renderHeader, updateHeaderCount } from '../components/Header';
 import { renderPromptList } from '../components/PromptList';
@@ -52,9 +52,14 @@ export async function renderMainView(
   root.appendChild(body);
   root.appendChild(footerContainer);
 
+  // All four header callbacks are wired up before data arrives so the buttons
+  // are always visible from the first paint.
+  let doFetch = async (): Promise<void> => {};
   renderHeader(headerContainer, {
-    onSettings: () => navigate('settings'),
-    onRecent: () => navigate('recent'),
+    onRefresh:   () => void doFetch(),
+    onFavorites: () => navigate('favorites'),
+    onRecent:    () => navigate('recent'),
+    onSettings:  () => navigate('settings'),
   });
   renderEmptyState(body, { reason: 'loading' });
 
@@ -64,15 +69,14 @@ export async function renderMainView(
     return;
   }
 
-  const fetchAndRender = async (): Promise<void> => {
+  doFetch = async (): Promise<void> => {
     renderEmptyState(body, { reason: 'loading' });
     const response = await sendToContent<PromptsResponse>(tabId, { type: 'GET_PROMPTS' });
 
     if (!response) {
-      renderHeader(headerContainer, {
-        onSettings: () => navigate('settings'),
-        onRecent: () => navigate('recent'),
-      });
+      // Unsupported site: size the popup like the Settings view (auto-height)
+      // so it doesn't show a tiny empty state inside a 600px shell.
+      document.body.classList.remove('pn-list-view');
       searchContainer.hidden = true;
       searchContainer.innerHTML = '';
       footerContainer.innerHTML = '';
@@ -94,9 +98,10 @@ export async function renderMainView(
 
     const header = renderHeader(headerContainer, {
       count: prompts.length,
-      onRefresh: () => void fetchAndRender(),
-      onSettings: () => navigate('settings'),
-      onRecent: () => navigate('recent'),
+      onRefresh:   () => void doFetch(),
+      onFavorites: () => navigate('favorites'),
+      onRecent:    () => navigate('recent'),
+      onSettings:  () => navigate('settings'),
     });
 
     const refreshFooter = (): void => {
@@ -236,15 +241,24 @@ export async function renderMainView(
       shortcuts: settings.shortcuts,
     });
 
-    // Dispose shortcuts when the view is replaced
+    // Re-fetch when the floating navigator detects a SPA navigation.
+    const urlChangedListener = (msg: unknown): void => {
+      if ((msg as RuntimeMessage).type === 'URL_CHANGED') {
+        void doFetch();
+      }
+    };
+    browser.runtime.onMessage.addListener(urlChangedListener);
+
+    // Dispose shortcuts and URL listener when the view is replaced
     const observer = new MutationObserver(() => {
       if (!document.contains(body)) {
         disposeKeys();
+        browser.runtime.onMessage.removeListener(urlChangedListener);
         observer.disconnect();
       }
     });
     observer.observe(root, { childList: true });
   };
 
-  await fetchAndRender();
+  await doFetch();
 }

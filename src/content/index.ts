@@ -9,7 +9,7 @@ import { logger } from '@/shared/logger';
 import { findAdapter } from './adapters/registry';
 import { toMessagePrompt } from './adapters/base';
 import type { DomPrompt } from './adapters/base';
-import type { Message, AnyResponse } from '@/shared/messages';
+import type { Message, AnyResponse, RuntimeMessage } from '@/shared/messages';
 import type { PromptAdapter } from './adapters/base';
 import { flashHighlight } from './highlight';
 import { injectFloatingButton, removeFloatingButton } from './floating-button';
@@ -96,6 +96,9 @@ const navObserver = new MutationObserver(() => {
     logger.debug('content: SPA navigation detected, re-initializing');
     disposeObserver?.();
     init();
+    // Notify any open extension pages (e.g. floating navigator iframe) so they
+    // can re-fetch the updated prompt list without user interaction.
+    void browser.runtime.sendMessage({ type: 'URL_CHANGED', url: location.href } satisfies RuntimeMessage);
   }
 });
 

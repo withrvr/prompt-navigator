@@ -25,7 +25,7 @@ export function navigate(view: ViewName): void {
       void renderMainView(root, navigate);
       break;
     case 'settings':
-      renderSettingsView(root, () => navigate('main'), navigate);
+      renderSettingsView(root, () => navigate('main'));
       break;
     case 'info':
       renderInfoView(root, () => navigate('main'));
