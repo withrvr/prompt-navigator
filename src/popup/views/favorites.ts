@@ -79,10 +79,17 @@ export async function renderFavoritesView(root: HTMLElement, onBack: () => void)
   searchContainer.appendChild(searchBar);
 
   // ── Footer ─────────────────────────────────────────────────────────────────
+  // Mirrors the structure of Footer.ts so layout and behaviour are consistent:
+  //   leftGroup  → scroll buttons + Select/Done + All/None (always in DOM)
+  //   rightGroup → Export button + dropdown menu (position:relative for menu)
   const renderFooter = (): void => {
     footerContainer.innerHTML = '';
     const footer = document.createElement('footer');
     footer.className = 'app__footer';
+
+    // ── Left group ───────────────────────────────────────────────────────────
+    const leftGroup = document.createElement('div');
+    leftGroup.className = 'footer__left';
 
     const scrollGroup = document.createElement('div');
     scrollGroup.className = 'footer__scroll-group';
@@ -91,12 +98,14 @@ export async function renderFavoritesView(root: HTMLElement, onBack: () => void)
     scrollTopBtn.className = 'app__btn app__btn--icon footer__scroll-btn';
     scrollTopBtn.textContent = '⬆';
     scrollTopBtn.title = 'Scroll to top';
+    scrollTopBtn.setAttribute('aria-label', 'Scroll to top');
     scrollTopBtn.addEventListener('click', () => body.scrollTo({ top: 0, behavior: 'smooth' }));
 
     const scrollBotBtn = document.createElement('button');
     scrollBotBtn.className = 'app__btn app__btn--icon footer__scroll-btn';
     scrollBotBtn.textContent = '⬇';
     scrollBotBtn.title = 'Scroll to bottom';
+    scrollBotBtn.setAttribute('aria-label', 'Scroll to bottom');
     scrollBotBtn.addEventListener('click', () =>
       body.scrollTo({ top: body.scrollHeight, behavior: 'smooth' }),
     );
@@ -106,6 +115,8 @@ export async function renderFavoritesView(root: HTMLElement, onBack: () => void)
     const selectBtn = document.createElement('button');
     selectBtn.className = `app__btn app__btn--select${selectionMode ? ' app__btn--select-active' : ''}`;
     selectBtn.textContent = selectionMode ? 'Done' : 'Select';
+    selectBtn.setAttribute('aria-pressed', String(selectionMode));
+    selectBtn.setAttribute('title', selectionMode ? 'Exit selection mode' : 'Select favorites to export');
     selectBtn.addEventListener('click', () => {
       selectionMode = !selectionMode;
       if (!selectionMode) selectedTexts.clear();
@@ -113,36 +124,44 @@ export async function renderFavoritesView(root: HTMLElement, onBack: () => void)
       renderFooter();
     });
 
+    // Always in the DOM — visibility toggled so layout never shifts (same as Footer.ts)
     const selectAllGroup = document.createElement('div');
-    selectAllGroup.className = 'footer__select-all-group';
-    if (selectionMode) {
-      const visible = filteredTexts();
-      const allBtn = document.createElement('button');
-      allBtn.className = 'app__btn footer__all-btn';
-      allBtn.textContent = '✓ All';
-      allBtn.addEventListener('click', () => {
-        visible.forEach((t) => selectedTexts.add(t));
-        rebuildList();
-        renderFooter();
-      });
-      const noneBtn = document.createElement('button');
-      noneBtn.className = 'app__btn footer__all-btn';
-      noneBtn.textContent = '✕ None';
-      noneBtn.addEventListener('click', () => {
-        selectedTexts.clear();
-        rebuildList();
-        renderFooter();
-      });
-      selectAllGroup.appendChild(allBtn);
-      selectAllGroup.appendChild(noneBtn);
-    }
+    selectAllGroup.className =
+      'footer__select-all-group' + (selectionMode ? ' footer__select-all-group--visible' : '');
+    selectAllGroup.setAttribute('aria-hidden', String(!selectionMode));
 
-    // Determine export list
+    const allBtn = document.createElement('button');
+    allBtn.className = 'app__btn footer__all-btn';
+    allBtn.textContent = '✓ All';
+    allBtn.title = 'Select all';
+    allBtn.addEventListener('click', () => {
+      filteredTexts().forEach((t) => selectedTexts.add(t));
+      rebuildList();
+      renderFooter();
+    });
+    const noneBtn = document.createElement('button');
+    noneBtn.className = 'app__btn footer__all-btn';
+    noneBtn.textContent = '✕ None';
+    noneBtn.title = 'Deselect all';
+    noneBtn.addEventListener('click', () => {
+      selectedTexts.clear();
+      rebuildList();
+      renderFooter();
+    });
+    selectAllGroup.appendChild(allBtn);
+    selectAllGroup.appendChild(noneBtn);
+
+    leftGroup.appendChild(scrollGroup);
+    leftGroup.appendChild(selectBtn);
+    leftGroup.appendChild(selectAllGroup);
+
+    // ── Right group (position:relative so export menu anchors correctly) ─────
+    const rightGroup = document.createElement('div');
+    rightGroup.className = 'footer__right';
+
     const visible = filteredTexts();
     const exportTexts =
-      selectionMode && selectedTexts.size > 0
-        ? [...selectedTexts]
-        : visible;
+      selectionMode && selectedTexts.size > 0 ? [...selectedTexts] : visible;
     const exportLabel =
       selectionMode && selectedTexts.size > 0
         ? `📤 Export (${selectedTexts.size})`
@@ -153,10 +172,13 @@ export async function renderFavoritesView(root: HTMLElement, onBack: () => void)
     const exportBtn = document.createElement('button');
     exportBtn.className = 'app__btn app__btn--export';
     exportBtn.textContent = exportLabel;
+    exportBtn.setAttribute('aria-haspopup', 'true');
+    exportBtn.setAttribute('aria-expanded', 'false');
 
     const menu = document.createElement('ul');
     menu.className = 'export-menu';
     menu.hidden = true;
+    menu.setAttribute('role', 'menu');
 
     let outsideListener: ((e: MouseEvent) => void) | null = null;
     const closeMenu = (): void => {
@@ -171,7 +193,7 @@ export async function renderFavoritesView(root: HTMLElement, onBack: () => void)
       menu.hidden = false;
       exportBtn.setAttribute('aria-expanded', 'true');
       outsideListener = (e: MouseEvent) => {
-        if (!footer.contains(e.target as Node)) closeMenu();
+        if (!rightGroup.contains(e.target as Node)) closeMenu();
       };
       setTimeout(() => document.addEventListener('click', outsideListener!), 0);
     };
@@ -199,11 +221,11 @@ export async function renderFavoritesView(root: HTMLElement, onBack: () => void)
       menu.appendChild(li);
     }
 
-    footer.appendChild(scrollGroup);
-    footer.appendChild(selectBtn);
-    footer.appendChild(selectAllGroup);
-    footer.appendChild(exportBtn);
-    footer.appendChild(menu);
+    rightGroup.appendChild(exportBtn);
+    rightGroup.appendChild(menu);
+
+    footer.appendChild(leftGroup);
+    footer.appendChild(rightGroup);
     footerContainer.appendChild(footer);
   };
 
